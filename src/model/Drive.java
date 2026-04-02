@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 
-// Drive class represents a campus placement drive posted by a company
 public class Drive {
 
     private String driveId;
@@ -16,160 +15,173 @@ public class Drive {
     private ArrayList<String> requiredSkills;
     private String driveDate;
     private String location;
-    private String jobType;          // Full-time, Internship, etc.
-    private String status;           // ACTIVE, CLOSED
+    private String jobType;        
+    private String status;          
 
-    // Constructor
-    public Drive(String driveId, String companyId, String companyName,
-                 String jobRole, double ctc, double minCgpa, int maxBacklogs,
-                 String driveDate, String location, String jobType) {
-        this.driveId = driveId;
-        this.companyId = companyId;
-        this.companyName = companyName;
-        this.jobRole = jobRole;
-        this.ctc = ctc;
-        this.minCgpa = minCgpa;
-        this.maxBacklogs = maxBacklogs;
-        this.driveDate = driveDate;
-        this.location = location;
-        this.jobType = jobType;
-        this.status = "ACTIVE";
-        this.eligibleBranches = new ArrayList<String>();
-        this.requiredSkills = new ArrayList<String>();
-    }
+public Drive(String dId, String cId, String cName,
+             String jRole, double ctcVal, double minCgpaVal, int maxBacklogsVal,
+             String dDate, String loc, String jType) {
 
-    // Getters and Setters
-    public String getDriveId() {
-        return driveId;
-    }
+        driveId = dId;
+        companyId = cId;
+        companyName = cName;
+        jobRole = jRole;
+        ctc = ctcVal;
+        minCgpa = minCgpaVal;
+        maxBacklogs = maxBacklogsVal;
+        driveDate = dDate;
+        location = loc;
+        jobType = jType;
 
-    public void setDriveId(String driveId) {
-        this.driveId = driveId;
-    }
+        status = "ACTIVE";
+        eligibleBranches = new ArrayList<String>();
+        requiredSkills = new ArrayList<String>();
+}
 
-    public String getCompanyId() {
-        return companyId;
-    }
 
-    public String getCompanyName() {
-        return companyName;
-    }
+        public String getDriveId() {
+            return driveId;
+        }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
+        public void setDriveId(String dId) {
+            driveId = dId;
+        }
 
-    public String getJobRole() {
-        return jobRole;
-    }
+        public String getCompanyId() {
+            return companyId;
+        }
 
-    public void setJobRole(String jobRole) {
-        this.jobRole = jobRole;
-    }
+        public String getCompanyName() {
+            return companyName;
+        }
 
-    public double getCtc() {
-        return ctc;
-    }
+        public void setCompanyName(String cName) {
+            companyName = cName;
+        }
 
-    public void setCtc(double ctc) {
-        this.ctc = ctc;
-    }
+        public String getJobRole() {
+            return jobRole;
+        }
 
-    public double getMinCgpa() {
-        return minCgpa;
-    }
+        public void setJobRole(String jRole) {
+            jobRole = jRole;
+        }
 
-    public void setMinCgpa(double minCgpa) {
-        this.minCgpa = minCgpa;
-    }
+        public double getCtc() {
+            return ctc;
+        }
 
-    public int getMaxBacklogs() {
-        return maxBacklogs;
-    }
+        public void setCtc(double ctcVal) {
+            ctc = ctcVal;
+        }
 
-    public void setMaxBacklogs(int maxBacklogs) {
-        this.maxBacklogs = maxBacklogs;
-    }
+        public double getMinCgpa() {
+            return minCgpa;
+        }
 
-    public ArrayList<String> getEligibleBranches() {
-        return eligibleBranches;
-    }
+        public void setMinCgpa(double minCgpaVal) {
+            minCgpa = minCgpaVal;
+        }
 
-    public void addEligibleBranch(String branch) {
-        this.eligibleBranches.add(branch.trim().toUpperCase());
-    }
+        public int getMaxBacklogs() {
+            return maxBacklogs;
+        }
 
-    public ArrayList<String> getRequiredSkills() {
-        return requiredSkills;
-    }
+        public void setMaxBacklogs(int maxBacklogsVal) {
+            maxBacklogs = maxBacklogsVal;
+        }
 
-    public void addRequiredSkill(String skill) {
-        this.requiredSkills.add(skill.trim().toLowerCase());
-    }
+        public ArrayList<String> getEligibleBranches() {
+            return eligibleBranches;
+        }
 
-    public String getDriveDate() {
-        return driveDate;
-    }
+        public void addEligibleBranch(String branch) {
+            eligibleBranches.add(branch.trim().toUpperCase());
+        }
 
-    public void setDriveDate(String driveDate) {
-        this.driveDate = driveDate;
-    }
+        public ArrayList<String> getRequiredSkills() {
+            return requiredSkills;
+        }
 
-    public String getLocation() {
-        return location;
-    }
+        public void addRequiredSkill(String skill) {
+            requiredSkills.add(skill.trim().toLowerCase());
+        }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+        public String getDriveDate() {
+            return driveDate;
+        }
 
-    public String getJobType() {
-        return jobType;
-    }
+        public void setDriveDate(String dDate) {
+            driveDate = dDate;
+        }
 
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
-    }
+        public String getLocation() {
+            return location;
+        }
 
-    public String getStatus() {
-        return status;
-    }
+        public void setLocation(String loc) {
+            location = loc;
+        }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+        public String getJobType() {
+            return jobType;
+        }
 
-    // Get branches as a semicolon-separated string
+        public void setJobType(String jType) {
+            jobType = jType;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String stat) {
+            status = stat;
+        }
+
+
+
+
     public String getBranchesAsString() {
+       
         if (eligibleBranches.isEmpty()) {
             return "ALL";
         }
+
         String result = "";
         for (int i = 0; i < eligibleBranches.size(); i++) {
+
             result += eligibleBranches.get(i);
+
             if (i < eligibleBranches.size() - 1) {
                 result += ";";
             }
+
         }
         return result;
     }
 
-    // Get skills as a semicolon-separated string
+
     public String getSkillsAsString() {
+
         if (requiredSkills.isEmpty()) {
             return "NONE";
         }
+
         String result = "";
+
         for (int i = 0; i < requiredSkills.size(); i++) {
+
             result += requiredSkills.get(i);
+
             if (i < requiredSkills.size() - 1) {
                 result += ";";
             }
+
         }
         return result;
     }
 
-    // Print drive details in a nice format
     public void printDetails() {
         System.out.println("  Drive ID     : " + driveId);
         System.out.println("  Company      : " + companyName);

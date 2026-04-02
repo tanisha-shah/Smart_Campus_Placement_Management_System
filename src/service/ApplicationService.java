@@ -4,129 +4,158 @@ import model.Application;
 import model.Drive;
 import model.Student;
 import utils.FileHelper;
-import utils.UIHelper;
 import exceptions.AlreadyAppliedException;
 
 import java.util.ArrayList;
 
-// ApplicationService handles applying for drives and updating status
 public class ApplicationService {
 
     // Apply for a drive
     public void applyForDrive(Student student, Drive drive) throws AlreadyAppliedException {
-        // Check if already applied
+
         if (hasAlreadyApplied(student.getUserId(), drive.getDriveId())) {
-            throw new AlreadyAppliedException("You have already applied for this drive: "
-                    + drive.getCompanyName() + " - " + drive.getJobRole());
+            throw new AlreadyAppliedException("Already applied");
         }
 
-        // Create new application
-        String appId = UIHelper.generateId("APP");
-        String today = UIHelper.getTodayDate();
-        Application app = new Application(appId, student.getUserId(), student.getName(),
-                drive.getDriveId(), drive.getCompanyName(), drive.getJobRole(), today);
+        String appId = "APP" + System.currentTimeMillis();
+        String today = java.time.LocalDate.now().toString();
 
-        // Save to file
+        Application app = new Application(
+                appId,
+                student.getUserId(),
+                student.getName(),
+                drive.getDriveId(),
+                drive.getCompanyName(),
+                drive.getJobRole(),
+                today
+        );
+
         FileHelper.writeLineToFile(FileHelper.APPLICATIONS_FILE, app.toFileString());
-        UIHelper.printSuccess("Applied successfully to " + drive.getCompanyName()
-                + " for the role of " + drive.getJobRole());
+
+        System.out.println("Applied successfully");
     }
 
-    // Check if student already applied to a drive
+    // check already applied
     public boolean hasAlreadyApplied(String studentId, String driveId) {
-        ArrayList<Application> apps = getApplicationsByStudent(studentId);
-        for (int i = 0; i < apps.size(); i++) {
-            if (apps.get(i).getDriveId().equals(driveId)) {
+
+        ArrayList<Application> list = getApplicationsByStudent(studentId);
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getDriveId().equals(driveId)) {
                 return true;
             }
         }
+
         return false;
     }
 
-    // Get all applications by a student
+    // by student
     public ArrayList<Application> getApplicationsByStudent(String studentId) {
+
         ArrayList<Application> result = new ArrayList<Application>();
-        ArrayList<Application> allApps = getAllApplications();
-        for (int i = 0; i < allApps.size(); i++) {
-            if (allApps.get(i).getStudentId().equals(studentId)) {
-                result.add(allApps.get(i));
+        ArrayList<Application> all = getAllApplications();
+
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getStudentId().equals(studentId)) {
+                result.add(all.get(i));
             }
         }
+
         return result;
     }
 
-    // Get all applications for a specific drive
+    // by drive
     public ArrayList<Application> getApplicationsByDrive(String driveId) {
+
         ArrayList<Application> result = new ArrayList<Application>();
-        ArrayList<Application> allApps = getAllApplications();
-        for (int i = 0; i < allApps.size(); i++) {
-            if (allApps.get(i).getDriveId().equals(driveId)) {
-                result.add(allApps.get(i));
+        ArrayList<Application> all = getAllApplications();
+
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getDriveId().equals(driveId)) {
+                result.add(all.get(i));
             }
         }
+
         return result;
     }
 
-    // Get ALL applications
+    // all applications
     public ArrayList<Application> getAllApplications() {
-        ArrayList<Application> apps = new ArrayList<Application>();
+
+        ArrayList<Application> list = new ArrayList<Application>();
         ArrayList<String> lines = FileHelper.readAllLines(FileHelper.APPLICATIONS_FILE);
+
         for (int i = 0; i < lines.size(); i++) {
             Application app = parseApplicationFromLine(lines.get(i));
             if (app != null) {
-                apps.add(app);
+                list.add(app);
             }
         }
-        return apps;
+
+        return list;
     }
 
-    // Update application status (Shortlist or Reject)
+    // update status
     public boolean updateApplicationStatus(String applicationId, String newStatus) {
+
         ArrayList<String> lines = FileHelper.readAllLines(FileHelper.APPLICATIONS_FILE);
-        ArrayList<String> updatedLines = new ArrayList<String>();
+        ArrayList<String> updated = new ArrayList<String>();
+
         boolean found = false;
 
         for (int i = 0; i < lines.size(); i++) {
+
             String[] parts = lines.get(i).split(",");
-            // Format: appId,studentId,studentName,driveId,companyName,jobRole,status,date
+
             if (parts.length >= 8 && parts[0].equals(applicationId)) {
-                // Replace status (index 6)
+
                 parts[6] = newStatus;
-                // Rebuild the line
-                String updatedLine = "";
+
+                String newLine = "";
                 for (int j = 0; j < parts.length; j++) {
-                    updatedLine += parts[j];
-                    if (j < parts.length - 1) updatedLine += ",";
+                    newLine += parts[j];
+                    if (j < parts.length - 1) {
+                        newLine += ",";
+                    }
                 }
-                updatedLines.add(updatedLine);
+
+                updated.add(newLine);
                 found = true;
+
             } else {
-                updatedLines.add(lines.get(i));
+                updated.add(lines.get(i));
             }
         }
 
         if (found) {
-            FileHelper.writeAllLines(FileHelper.APPLICATIONS_FILE, updatedLines);
+            FileHelper.writeAllLines(FileHelper.APPLICATIONS_FILE, updated);
         }
+
         return found;
     }
 
-    // Get total application count
+    // count
     public int getApplicationCount() {
         return getAllApplications().size();
     }
 
-    // Parse Application from CSV line
+    // parse
     private Application parseApplicationFromLine(String line) {
-        try {
-            String[] parts = line.split(",");
-            // Format: appId,studentId,studentName,driveId,companyName,jobRole,status,date
-            if (parts.length < 8) return null;
 
-            Application app = new Application(parts[0], parts[1], parts[2],
-                    parts[3], parts[4], parts[5], parts[7]);
-            app.setStatus(parts[6]);
-            return app;
+        try {
+            String[] p = line.split(",");
+
+            if (p.length < 8) return null;
+
+            Application a = new Application(
+                    p[0], p[1], p[2],
+                    p[3], p[4], p[5], p[7]
+            );
+
+            a.setStatus(p[6]);
+
+            return a;
+
         } catch (Exception e) {
             return null;
         }

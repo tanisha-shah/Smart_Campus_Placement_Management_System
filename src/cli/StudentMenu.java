@@ -1,350 +1,262 @@
 package cli;
 
-import model.Student;
-import model.Drive;
-import model.Application;
-import model.Notification;
-import service.UserService;
-import service.DriveService;
-import service.ApplicationService;
-import service.NotificationService;
-import service.ReportService;
-import utils.UIHelper;
-import exceptions.AlreadyAppliedException;
-import exceptions.DriveNotFoundException;
-
 import java.util.ArrayList;
 import java.util.Scanner;
+import model.Application;
+import model.Drive;
+import model.Student;
+import service.ApplicationService;
+import service.DriveService;
+import service.ReportService;
+import service.UserService;
 
-// StudentMenu handles all student interactions via CLI
 public class StudentMenu {
 
     private Scanner scanner;
     private UserService userService;
     private DriveService driveService;
     private ApplicationService applicationService;
-    private NotificationService notificationService;
     private ReportService reportService;
     private Student loggedInStudent;
 
-    public StudentMenu(Scanner scanner, UserService userService, DriveService driveService,
-                       ApplicationService applicationService,
-                       NotificationService notificationService,
-                       ReportService reportService) {
-        this.scanner = scanner;
-        this.userService = userService;
-        this.driveService = driveService;
-        this.applicationService = applicationService;
-        this.notificationService = notificationService;
-        this.reportService = reportService;
+    public StudentMenu(Scanner sc, UserService us, DriveService ds,
+                       ApplicationService as, ReportService rs) {
+
+        scanner = sc;
+        userService = us;
+        driveService = ds;
+        applicationService = as;
+        reportService = rs;
     }
 
-    // Main student menu loop
-    public void showMenu(Student student) {
-        this.loggedInStudent = student;
+    // MAIN MENU
+    public void showMenu(Student stu) {
+        loggedInStudent = stu;
         int choice = 0;
 
-        while (choice != 9) {
-            UIHelper.printBlankLine();
-            UIHelper.printHeading("STUDENT MENU - Welcome, " + loggedInStudent.getName());
+        while (choice != 8) {
 
-            // Show unread notification count
-            int unread = notificationService.getUnreadCount(loggedInStudent.getUserId());
-            if (unread > 0) {
-                System.out.println("  ** You have " + unread + " unread notification(s)! **");
-                UIHelper.printLine();
-            }
+            System.out.println("\n===== STUDENT MENU =====");
+            System.out.println("Welcome, " + loggedInStudent.getName());
 
-            UIHelper.printMenuItem(1, "View All Campus Drives");
-            UIHelper.printMenuItem(2, "View Eligible Drives");
-            UIHelper.printMenuItem(3, "Apply for a Drive");
-            UIHelper.printMenuItem(4, "Track My Applications");
-            UIHelper.printMenuItem(5, "Analyze Skill Gap");
-            UIHelper.printMenuItem(6, "View Resume Score");
-            UIHelper.printMenuItem(7, "View Notifications");
-            UIHelper.printMenuItem(8, "Manage My Skills");
-            UIHelper.printMenuItem(9, "Logout");
-            UIHelper.printLine();
-            UIHelper.printChoicePrompt();
+            System.out.println("1. View All Drives");
+            System.out.println("2. View Eligible Drives");
+            System.out.println("3. Apply for Drive");
+            System.out.println("4. Track Applications");
+            System.out.println("5. Skill Gap Analysis");
+            System.out.println("6. Resume Score");
+            System.out.println("7. Manage Skills");
+            System.out.println("8. Logout");
+            System.out.print("Enter choice: ");
 
             try {
-                choice = Integer.parseInt(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                UIHelper.printError("Please enter a valid number.");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid input");
                 continue;
             }
 
             switch (choice) {
-                case 1:
-                    viewAllDrives();
-                    break;
-                case 2:
-                    viewEligibleDrives();
-                    break;
-                case 3:
-                    applyForDrive();
-                    break;
-                case 4:
-                    trackApplications();
-                    break;
-                case 5:
-                    analyzeSkillGap();
-                    break;
-                case 6:
-                    viewResumeScore();
-                    break;
-                case 7:
-                    viewNotifications();
-                    break;
-                case 8:
-                    manageSkills();
-                    break;
-                case 9:
-                    UIHelper.printInfo("Logging out. Goodbye, " + loggedInStudent.getName() + "!");
-                    break;
-                default:
-                    UIHelper.printError("Invalid choice. Please enter a number between 1 and 9.");
+                case 1: viewAllDrives(); break;
+                case 2: viewEligibleDrives(); break;
+                case 3: applyForDrive(); break;
+                case 4: trackApplications(); break;
+                case 5: analyzeSkillGap(); break;
+                case 6: viewResumeScore(); break;
+                case 7: manageSkills(); break;
+                case 8: System.out.println("Logging out..."); break;
+                default: System.out.println("Invalid choice");
             }
         }
     }
 
-    // 1. View ALL active drives
+    // 1. View all drives
     private void viewAllDrives() {
-        UIHelper.printSubHeading("ALL ACTIVE CAMPUS DRIVES");
+
+        System.out.println("\n--- ALL DRIVES ---");
+
         ArrayList<Drive> drives = driveService.getActiveDrives();
-        if (drives.isEmpty()) {
-            UIHelper.printInfo("No active drives available at the moment.");
+
+        if (drives.size() == 0) {
+            System.out.println("No drives available");
             return;
         }
+
         for (int i = 0; i < drives.size(); i++) {
-            System.out.println("  [Drive " + (i + 1) + "]");
+            System.out.println("\nDrive " + (i + 1));
             drives.get(i).printDetails();
-            UIHelper.printLine();
         }
-        System.out.println("  Total drives found: " + drives.size());
+
+        System.out.println("Total: " + drives.size());
     }
 
-    // 2. View ELIGIBLE drives only
+    // 2. View eligible drives
     private void viewEligibleDrives() {
-        UIHelper.printSubHeading("DRIVES YOU ARE ELIGIBLE FOR");
-        ArrayList<Drive> eligibleDrives = driveService.getEligibleDrives(loggedInStudent);
-        if (eligibleDrives.isEmpty()) {
-            UIHelper.printInfo("No eligible drives found based on your profile.");
-            UIHelper.printInfo("Your Profile - CGPA: " + loggedInStudent.getCgpa()
-                    + " | Branch: " + loggedInStudent.getBranch()
-                    + " | Backlogs: " + loggedInStudent.getBacklogs());
+
+        System.out.println("\n--- ELIGIBLE DRIVES ---");
+
+        ArrayList<Drive> drives = driveService.getEligibleDrives(loggedInStudent);
+
+        if (drives.size() == 0) {
+            System.out.println("No eligible drives");
             return;
         }
-        for (int i = 0; i < eligibleDrives.size(); i++) {
-            System.out.println("  [Drive " + (i + 1) + "]");
-            eligibleDrives.get(i).printDetails();
-            UIHelper.printLine();
+
+        for (int i = 0; i < drives.size(); i++) {
+            System.out.println("\nDrive " + (i + 1));
+            drives.get(i).printDetails();
         }
-        System.out.println("  Total eligible drives: " + eligibleDrives.size());
+
+        System.out.println("Total: " + drives.size());
     }
 
-    // 3. Apply for a drive
+    // 3. Apply for drive
     private void applyForDrive() {
-        UIHelper.printSubHeading("APPLY FOR A DRIVE");
 
-        ArrayList<Drive> eligibleDrives = driveService.getEligibleDrives(loggedInStudent);
-        if (eligibleDrives.isEmpty()) {
-            UIHelper.printInfo("No eligible drives to apply for.");
+        System.out.println("\n--- APPLY FOR DRIVE ---");
+
+        ArrayList<Drive> drives = driveService.getEligibleDrives(loggedInStudent);
+
+        if (drives.size() == 0) {
+            System.out.println("No eligible drives");
             return;
         }
 
-        // Show eligible drives with numbers
-        System.out.println("  Your eligible drives:");
-        UIHelper.printLine();
-        for (int i = 0; i < eligibleDrives.size(); i++) {
-            System.out.println("  " + (i + 1) + ". " + eligibleDrives.get(i).getCompanyName()
-                    + " | " + eligibleDrives.get(i).getJobRole()
-                    + " | " + eligibleDrives.get(i).getCtc() + " LPA"
-                    + " | ID: " + eligibleDrives.get(i).getDriveId());
+        for (int i = 0; i < drives.size(); i++) {
+            System.out.println((i + 1) + ". "
+                    + drives.get(i).getCompanyName()
+                    + " | " + drives.get(i).getJobRole()
+                    + " | ID: " + drives.get(i).getDriveId());
         }
-        UIHelper.printLine();
-        System.out.print("  Enter Drive ID to apply (or 0 to go back): ");
-        String driveId = scanner.nextLine().trim();
 
-        if (driveId.equals("0")) return;
+        System.out.print("Enter Drive ID: ");
+        String id = scanner.nextLine();
 
         try {
-            Drive selectedDrive = driveService.getDriveById(driveId);
-            applicationService.applyForDrive(loggedInStudent, selectedDrive);
+            Drive d = driveService.getDriveById(id);
+            applicationService.applyForDrive(loggedInStudent, d);
+            System.out.println("Applied successfully");
 
-            // Send confirmation notification to student
-            notificationService.sendNotification(
-                    loggedInStudent.getUserId(),
-                    "You have successfully applied to " + selectedDrive.getCompanyName()
-                            + " for the role of " + selectedDrive.getJobRole(),
-                    "APPLICATION"
-            );
-
-        } catch (DriveNotFoundException e) {
-            UIHelper.printError(e.getMessage());
-        } catch (AlreadyAppliedException e) {
-            UIHelper.printError(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    // 4. Track application status
+    // 4. Track applications
     private void trackApplications() {
-        UIHelper.printSubHeading("MY APPLICATION STATUS");
-        ArrayList<Application> myApps = applicationService.getApplicationsByStudent(
-                loggedInStudent.getUserId());
 
-        if (myApps.isEmpty()) {
-            UIHelper.printInfo("You haven't applied to any drives yet.");
+        System.out.println("\n--- MY APPLICATIONS ---");
+
+        ArrayList<Application> apps =
+                applicationService.getApplicationsByStudent(loggedInStudent.getUserId());
+
+        if (apps.size() == 0) {
+            System.out.println("No applications found");
             return;
         }
 
-        for (int i = 0; i < myApps.size(); i++) {
-            System.out.println("  [Application " + (i + 1) + "]");
-            myApps.get(i).printDetails();
-            UIHelper.printLine();
+        for (int i = 0; i < apps.size(); i++) {
+            apps.get(i).printDetails();
         }
-        System.out.println("  Total applications: " + myApps.size());
+
+        System.out.println("Total: " + apps.size());
     }
 
-    // 5. Analyze skill gap for a specific drive
+    // 5. Skill gap analysis
     private void analyzeSkillGap() {
-        UIHelper.printSubHeading("SKILL GAP ANALYSIS");
 
-        ArrayList<Drive> activeDrives = driveService.getActiveDrives();
-        if (activeDrives.isEmpty()) {
-            UIHelper.printInfo("No active drives to compare against.");
-            return;
+        System.out.println("\n--- SKILL GAP ---");
+
+        ArrayList<Drive> drives = driveService.getActiveDrives();
+
+        for (int i = 0; i < drives.size(); i++) {
+            System.out.println((i + 1) + ". "
+                    + drives.get(i).getCompanyName()
+                    + " | ID: " + drives.get(i).getDriveId());
         }
 
-        System.out.println("  Your current skills: " + loggedInStudent.getSkills().toString());
-        UIHelper.printLine();
-        System.out.println("  Active Drives:");
-        for (int i = 0; i < activeDrives.size(); i++) {
-            System.out.println("  " + (i + 1) + ". " + activeDrives.get(i).getCompanyName()
-                    + " - " + activeDrives.get(i).getJobRole()
-                    + " | ID: " + activeDrives.get(i).getDriveId());
-        }
-        UIHelper.printLine();
-        System.out.print("  Enter Drive ID for skill gap analysis (or 0 to go back): ");
-        String driveId = scanner.nextLine().trim();
-
-        if (driveId.equals("0")) return;
+        System.out.print("Enter Drive ID: ");
+        String id = scanner.nextLine();
 
         try {
-            Drive drive = driveService.getDriveById(driveId);
-            ArrayList<String> missingSkills = driveService.analyzeSkillGap(loggedInStudent, drive);
+            Drive d = driveService.getDriveById(id);
 
-            UIHelper.printLine();
-            System.out.println("  SKILL GAP REPORT for: " + drive.getCompanyName()
-                    + " - " + drive.getJobRole());
-            UIHelper.printLine();
-            System.out.println("  Required Skills : " + drive.getRequiredSkills().toString());
-            System.out.println("  Your Skills     : " + loggedInStudent.getSkills().toString());
-            UIHelper.printLine();
+            ArrayList<String> missing =
+                    driveService.analyzeSkillGap(loggedInStudent, d);
 
-            if (missingSkills.isEmpty()) {
-                UIHelper.printSuccess("Great! You have ALL the required skills for this drive!");
-            } else {
-                System.out.println("  Missing Skills  : " + missingSkills.toString());
-                System.out.println("  Tip: Learn the above " + missingSkills.size()
-                        + " skill(s) to improve your chances!");
-            }
+            System.out.println("Missing skills: " + missing);
 
-        } catch (DriveNotFoundException e) {
-            UIHelper.printError(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    // 6. View resume score
+    // 6. Resume score
     private void viewResumeScore() {
-        // Reload latest student data first
-        Student freshData = userService.getStudentById(loggedInStudent.getUserId());
-        if (freshData != null) {
-            loggedInStudent = freshData;
+
+        Student fresh = userService.getStudentById(loggedInStudent.getUserId());
+
+        if (fresh != null) {
+            loggedInStudent = fresh;
         }
+
         reportService.generateResumeReport(loggedInStudent);
     }
 
-    // 7. View notifications
-    private void viewNotifications() {
-        UIHelper.printSubHeading("MY NOTIFICATIONS");
-        ArrayList<Notification> notifs = notificationService.getNotificationsForUser(
-                loggedInStudent.getUserId());
-
-        if (notifs.isEmpty()) {
-            UIHelper.printInfo("No notifications yet.");
-            return;
-        }
-
-        // Show most recent first (reverse order)
-        for (int i = notifs.size() - 1; i >= 0; i--) {
-            notifs.get(i).printDetails();
-        }
-
-        System.out.println("  Total notifications: " + notifs.size());
-        UIHelper.printLine();
-
-        // Mark all as read
-        notificationService.markAllAsRead(loggedInStudent.getUserId());
-        UIHelper.printInfo("All notifications marked as read.");
-    }
-
-    // 8. Manage skills (add skills to profile)
+    // 7. Manage skills
     private void manageSkills() {
-        // Reload latest student data
-        Student freshData = userService.getStudentById(loggedInStudent.getUserId());
-        if (freshData != null) {
-            loggedInStudent = freshData;
-        }
 
-        UIHelper.printSubHeading("MANAGE MY SKILLS");
         int choice = 0;
 
         while (choice != 3) {
-            System.out.println("  Current Skills: " + loggedInStudent.getSkills().toString());
-            UIHelper.printLine();
-            UIHelper.printMenuItem(1, "Add a New Skill");
-            UIHelper.printMenuItem(2, "Remove a Skill");
-            UIHelper.printMenuItem(3, "Go Back");
-            UIHelper.printChoicePrompt();
+
+            System.out.println("\nYour Skills: " + loggedInStudent.getSkills());
+
+            System.out.println("1. Add Skill");
+            System.out.println("2. Remove Skill");
+            System.out.println("3. Back");
+            System.out.print("Enter choice: ");
 
             try {
-                choice = Integer.parseInt(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                UIHelper.printError("Please enter a valid number.");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid input");
                 continue;
             }
 
             if (choice == 1) {
-                System.out.print("  Enter skill to add: ");
-                String skill = scanner.nextLine().trim();
-                if (!skill.isEmpty()) {
-                    loggedInStudent.addSkill(skill);
+
+                System.out.print("Enter skill: ");
+                String s = scanner.nextLine();
+
+                if (!s.isEmpty()) {
+                    loggedInStudent.addSkill(s);
                     userService.updateStudent(loggedInStudent);
-                    UIHelper.printSuccess("Skill '" + skill + "' added successfully!");
-                } else {
-                    UIHelper.printError("Skill cannot be empty.");
+                    System.out.println("Skill added");
                 }
+
             } else if (choice == 2) {
-                System.out.print("  Enter skill to remove: ");
-                String skill = scanner.nextLine().trim().toLowerCase();
-                ArrayList<String> skills = loggedInStudent.getSkills();
+
+                System.out.print("Enter skill: ");
+                String s = scanner.nextLine();
+
+                ArrayList<String> list = loggedInStudent.getSkills();
                 boolean removed = false;
-                for (int i = 0; i < skills.size(); i++) {
-                    if (skills.get(i).equalsIgnoreCase(skill)) {
-                        skills.remove(i);
+
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).equalsIgnoreCase(s)) {
+                        list.remove(i);
                         removed = true;
                         break;
                     }
                 }
+
                 if (removed) {
                     userService.updateStudent(loggedInStudent);
-                    UIHelper.printSuccess("Skill '" + skill + "' removed.");
+                    System.out.println("Skill removed");
                 } else {
-                    UIHelper.printError("Skill '" + skill + "' not found in your profile.");
+                    System.out.println("Skill not found");
                 }
-            } else if (choice != 3) {
-                UIHelper.printError("Invalid choice. Enter 1, 2, or 3.");
             }
         }
     }

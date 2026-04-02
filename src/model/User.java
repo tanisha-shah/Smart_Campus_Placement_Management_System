@@ -1,72 +1,70 @@
 package model;
 
-// Base class for all users in the system
-// Student, Company, and Admin all extend this class
 public class User {
 
     private String userId;
     private String name;
     private String email;
     private String password;
-    private String role; // "STUDENT", "COMPANY", "ADMIN"
+    private String role; 
 
-    // Constructor
-    public User(String userId, String name, String email, String password, String role) {
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    public User(String uId, String n, String em, String p, String r ) {
+        userId = uId;
+        name = n;
+        email = em;
+        password = p;
+        role = r;
     }
 
-    // Getters and Setters (Encapsulation)
+    //(Encapsulation)
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserId(String uId) {
+        userId = uId;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String n) {
+        name = n;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String em ) {
+        email = em;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String p) {
+        password = p;
     }
 
     public String getRole() {
         return role;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole(String r) {
+        role = r;
     }
 
-    // This method can be overridden by child classes (Dynamic Method Dispatch)
+    //(Dynamic Method Dispatch)
     public String getDisplayInfo() {
         return "User ID: " + userId + " | Name: " + name + " | Email: " + email + " | Role: " + role;
     }
 
-    // Convert to file-safe string for storage
+    //Convert to file-safe string for storage
     public String toFileString() {
         return userId + "," + name + "," + email + "," + password + "," + role;
     }
 }
+

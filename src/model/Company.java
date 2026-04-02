@@ -1,47 +1,47 @@
 package model;
 
-// Company class extends User - Inheritance
+
 public class Company extends User {
 
     private String companyName;
     private String industry;
     private String contactPerson;
 
-    // Constructor
-    public Company(String userId, String name, String email, String password,
-                   String companyName, String industry, String contactPerson) {
-        super(userId, name, email, password, "COMPANY"); // Call parent constructor
-        this.companyName = companyName;
-        this.industry = industry;
-        this.contactPerson = contactPerson;
+   public Company(String uId, String nm, String em, String pass,
+               String compName, String ind, String contact) {
+
+        super(uId, nm, em, pass, "COMPANY");
+
+        companyName = compName;
+        industry = ind;
+        contactPerson = contact;
     }
 
-    // Getters and Setters
     public String getCompanyName() {
         return companyName;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setCompanyName(String compName) {
+        companyName = compName;
     }
 
     public String getIndustry() {
         return industry;
     }
 
-    public void setIndustry(String industry) {
-        this.industry = industry;
+    public void setIndustry(String ind) {
+        industry = ind;
     }
 
     public String getContactPerson() {
         return contactPerson;
     }
 
-    public void setContactPerson(String contactPerson) {
-        this.contactPerson = contactPerson;
+    public void setContactPerson(String contact) {
+        contactPerson = contact;
     }
 
-    // Override parent method - Dynamic Method Dispatch
+    //Dynamic Method Dispatch
     public String getDisplayInfo() {
         return "Company ID: " + getUserId() + " | Company: " + companyName
                 + " | Industry: " + industry + " | Contact: " + contactPerson

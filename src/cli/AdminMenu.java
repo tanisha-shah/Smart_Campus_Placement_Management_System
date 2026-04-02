@@ -1,20 +1,18 @@
 package cli;
 
-import model.Admin;
-import model.Student;
-import model.Company;
-import model.Drive;
-import model.Application;
-import service.UserService;
-import service.DriveService;
-import service.ApplicationService;
-import service.ReportService;
-import utils.UIHelper;
-
 import java.util.ArrayList;
 import java.util.Scanner;
+import model.Admin;
+import model.Application;
+import model.Company;
+import model.Drive;
+import model.Student;
+import service.ApplicationService;
+import service.DriveService;
+import service.ReportService;
+import service.UserService;
 
-// AdminMenu handles all admin interactions via CLI
+
 public class AdminMenu {
 
     private Scanner scanner;
@@ -24,37 +22,43 @@ public class AdminMenu {
     private ReportService reportService;
     private Admin loggedInAdmin;
 
-    public AdminMenu(Scanner scanner, UserService userService, DriveService driveService,
-                     ApplicationService applicationService, ReportService reportService) {
-        this.scanner = scanner;
-        this.userService = userService;
-        this.driveService = driveService;
-        this.applicationService = applicationService;
-        this.reportService = reportService;
+    public AdminMenu(Scanner sc, UserService us, DriveService ds,
+                 ApplicationService as, ReportService rs) {
+
+        scanner = sc;
+        userService = us;
+        driveService = ds;
+        applicationService = as;
+        reportService = rs;
     }
 
-    // Main admin menu loop
-    public void showMenu(Admin admin) {
-        this.loggedInAdmin = admin;
+
+   public void showMenu(Admin adminObj) {
+
+        loggedInAdmin = adminObj;
         int choice = 0;
 
         while (choice != 7) {
-            UIHelper.printBlankLine();
-            UIHelper.printHeading("ADMIN PANEL - Welcome, " + loggedInAdmin.getName());
-            UIHelper.printMenuItem(1, "View All Registered Students");
-            UIHelper.printMenuItem(2, "View All Registered Companies");
-            UIHelper.printMenuItem(3, "View All Campus Drives");
-            UIHelper.printMenuItem(4, "View All Applications");
-            UIHelper.printMenuItem(5, "View Student Profile Details");
-            UIHelper.printMenuItem(6, "Generate Summary Report");
-            UIHelper.printMenuItem(7, "Logout");
-            UIHelper.printLine();
-            UIHelper.printChoicePrompt();
+
+            System.out.println();
+            System.out.println("========== ADMIN PANEL ==========");
+            System.out.println("Welcome, " + loggedInAdmin.getName());
+            System.out.println("1. View All Registered Students");
+            System.out.println("2. View All Registered Companies");
+            System.out.println("3. View All Campus Drives");
+            System.out.println("4. View All Applications");
+            System.out.println("5. View Student Profile Details");
+            System.out.println("6. Generate Summary Report");
+            System.out.println("7. Logout");
+            System.out.println("---------------------------------");
+            System.out.print("Enter your choice: ");
 
             try {
+
                 choice = Integer.parseInt(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                UIHelper.printError("Please enter a valid number.");
+
+            } catch (Exception e) {
+                System.out.println("Invalid input. Enter number only.");
                 continue;
             }
 
@@ -78,146 +82,170 @@ public class AdminMenu {
                     generateReport();
                     break;
                 case 7:
-                    UIHelper.printInfo("Logging out of admin panel. Goodbye!");
+                    System.out.println("Logging out...");
                     break;
                 default:
-                    UIHelper.printError("Invalid choice. Enter a number between 1 and 7.");
+                    System.out.println("Invalid choice. Try again.");
             }
         }
     }
 
-    // 1. View all registered students
+
     private void viewAllStudents() {
-        UIHelper.printSubHeading("ALL REGISTERED STUDENTS");
+        System.out.println("\n--- ALL REGISTERED STUDENTS ---");
+
         ArrayList<Student> students = userService.getAllStudents();
 
-        if (students.isEmpty()) {
-            UIHelper.printInfo("No students registered yet.");
+        if (students.size() == 0) {
+            System.out.println("No students found.");
             return;
         }
 
         for (int i = 0; i < students.size(); i++) {
-            System.out.println("  [" + (i + 1) + "] " + students.get(i).getDisplayInfo());
+            System.out.println((i + 1) + ". " + students.get(i).getDisplayInfo());
         }
-        UIHelper.printLine();
-        System.out.println("  Total students: " + students.size());
+
+        System.out.println("Total students: " + students.size());
     }
 
-    // 2. View all registered companies
+
+
     private void viewAllCompanies() {
-        UIHelper.printSubHeading("ALL REGISTERED COMPANIES");
+        System.out.println("\n--- ALL REGISTERED COMPANIES ---");
+
         ArrayList<Company> companies = userService.getAllCompanies();
 
-        if (companies.isEmpty()) {
-            UIHelper.printInfo("No companies registered yet.");
+        if (companies.size() == 0) {
+            System.out.println("No companies found.");
             return;
         }
 
         for (int i = 0; i < companies.size(); i++) {
-            System.out.println("  [" + (i + 1) + "] " + companies.get(i).getDisplayInfo());
+            System.out.println((i + 1) + ". " + companies.get(i).getDisplayInfo());
         }
-        UIHelper.printLine();
-        System.out.println("  Total companies: " + companies.size());
+
+        System.out.println("Total companies: " + companies.size());
     }
 
-    // 3. View all campus drives
+
     private void viewAllDrives() {
-        UIHelper.printSubHeading("ALL CAMPUS DRIVES");
+        System.out.println("\n--- ALL DRIVES ---");
+
         ArrayList<Drive> drives = driveService.getAllDrives();
 
-        if (drives.isEmpty()) {
-            UIHelper.printInfo("No drives posted yet.");
+        if (drives.size() == 0) {
+            System.out.println("No drives available.");
             return;
         }
 
         for (int i = 0; i < drives.size(); i++) {
-            System.out.println("  [Drive " + (i + 1) + "]");
+            System.out.println("\nDrive " + (i + 1));
             drives.get(i).printDetails();
 
-            int appCount = applicationService.getApplicationsByDrive(
+            int count = applicationService.getApplicationsByDrive(
                     drives.get(i).getDriveId()).size();
-            System.out.println("  Total Applicants: " + appCount);
-            UIHelper.printLine();
+
+            System.out.println("Applicants: " + count);
         }
-        System.out.println("  Total drives: " + drives.size());
+
+        System.out.println("Total drives: " + drives.size());
     }
 
-    // 4. View all applications across the system
-    private void viewAllApplications() {
-        UIHelper.printSubHeading("ALL APPLICATIONS");
+
+
+   private void viewAllApplications() {
+        System.out.println("\n--- ALL APPLICATIONS ---");
+
         ArrayList<Application> apps = applicationService.getAllApplications();
 
-        if (apps.isEmpty()) {
-            UIHelper.printInfo("No applications submitted yet.");
+        if (apps.size() == 0) {
+            System.out.println("No applications found.");
             return;
         }
 
-        int applied = 0, shortlisted = 0, rejected = 0;
+        int applied = 0;
+        int shortlisted = 0;
+        int rejected = 0;
 
         for (int i = 0; i < apps.size(); i++) {
-            System.out.println("  [" + (i + 1) + "] AppID: " + apps.get(i).getApplicationId()
-                    + " | Student: " + apps.get(i).getStudentName()
-                    + " | Company: " + apps.get(i).getCompanyName()
-                    + " | Role: " + apps.get(i).getJobRole()
-                    + " | Status: " + apps.get(i).getStatus());
+            System.out.println((i + 1) + ". "
+                    + apps.get(i).getStudentName()
+                    + " | " + apps.get(i).getCompanyName()
+                    + " | " + apps.get(i).getJobRole()
+                    + " | " + apps.get(i).getStatus());
 
             String status = apps.get(i).getStatus();
-            if (status.equals("APPLIED")) applied++;
-            else if (status.equals("SHORTLISTED")) shortlisted++;
-            else if (status.equals("REJECTED")) rejected++;
+
+            if (status.equals("APPLIED")) {
+                applied++;
+            } else if (status.equals("SHORTLISTED")) {
+                shortlisted++;
+            } else if (status.equals("REJECTED")) {
+                rejected++;
+            }
         }
 
-        UIHelper.printLine();
-        System.out.println("  Total: " + apps.size()
-                + " | Applied: " + applied
-                + " | Shortlisted: " + shortlisted
-                + " | Rejected: " + rejected);
+        System.out.println("Total: " + apps.size());
+        System.out.println("Applied: " + applied);
+        System.out.println("Shortlisted: " + shortlisted);
+        System.out.println("Rejected: " + rejected);
     }
 
-    // 5. View a specific student's full profile
-    private void viewStudentProfile() {
-        UIHelper.printSubHeading("VIEW STUDENT PROFILE");
 
-        System.out.print("  Enter Student ID: ");
+    private void viewStudentProfile() {
+
+        System.out.println("\n--- VIEW STUDENT PROFILE ---");
+
+        System.out.print("Enter Student ID: ");
         String studentId = scanner.nextLine().trim();
 
         Student student = userService.getStudentById(studentId);
+
         if (student == null) {
-            UIHelper.printError("Student not found with ID: " + studentId);
+            System.out.println("Student not found with ID: " + studentId);
             return;
         }
 
-        UIHelper.printLine();
-        System.out.println("  STUDENT PROFILE:");
-        UIHelper.printLine();
-        System.out.println("  Student ID : " + student.getUserId());
-        System.out.println("  Name       : " + student.getName());
-        System.out.println("  Email      : " + student.getEmail());
-        System.out.println("  Branch     : " + student.getBranch());
-        System.out.println("  CGPA       : " + student.getCgpa());
-        System.out.println("  Backlogs   : " + student.getBacklogs());
-        System.out.println("  Skills     : " + student.getSkills().toString());
-        System.out.println("  Resume Score: " + student.getResumeScore() + " / 100");
-        UIHelper.printLine();
+        System.out.println("--------------------------------");
+        System.out.println("STUDENT PROFILE");
+        System.out.println("--------------------------------");
 
-        // Show their applications
+        System.out.println("Student ID  : " + student.getUserId());
+        System.out.println("Name        : " + student.getName());
+        System.out.println("Email       : " + student.getEmail());
+        System.out.println("Branch      : " + student.getBranch());
+        System.out.println("CGPA        : " + student.getCgpa());
+        System.out.println("Backlogs    : " + student.getBacklogs());
+        System.out.println("Skills      : " + student.getSkills());
+        System.out.println("Resume Score: " + student.getResumeScore() + " / 100");
+
+        System.out.println("--------------------------------");
+
+
         ArrayList<Application> apps = applicationService.getApplicationsByStudent(studentId);
-        System.out.println("  APPLICATIONS (" + apps.size() + " total):");
-        if (apps.isEmpty()) {
-            System.out.println("  No applications submitted.");
+
+        System.out.println("APPLICATIONS (" + apps.size() + "):");
+
+        if (apps.size() == 0) {
+            System.out.println("No applications found.");
         } else {
             for (int i = 0; i < apps.size(); i++) {
-                System.out.println("  -> " + apps.get(i).getCompanyName()
+                System.out.println("- " 
+                        + apps.get(i).getCompanyName()
                         + " | " + apps.get(i).getJobRole()
                         + " | Status: " + apps.get(i).getStatus());
             }
         }
-        UIHelper.printLine();
+
+        System.out.println("--------------------------------");
     }
 
-    // 6. Generate system-wide summary report
+
+
     private void generateReport() {
-        UIHelper.printSubHeading("GENERATING SUMMARY REPORT");
+
+        System.out.println("\n--- GENERATING SUMMARY REPORT ---");
+
         reportService.generateSummaryReport();
     }
 }

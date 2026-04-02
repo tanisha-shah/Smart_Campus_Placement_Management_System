@@ -1,23 +1,21 @@
-import cli.AuthMenu;
-import cli.StudentMenu;
-import cli.CompanyMenu;
 import cli.AdminMenu;
-import model.Student;
-import model.Company;
-import model.Admin;
-import service.UserService;
-import service.DriveService;
-import service.ApplicationService;
-import service.NotificationService;
-import service.ReportService;
-import utils.FileHelper;
-import utils.UIHelper;
-
+import cli.AuthMenu;
+import cli.CompanyMenu;
+import cli.StudentMenu;
 import java.util.Scanner;
+import model.Admin;
+import model.Company;
+import model.Student;
+import service.ApplicationService;
+import service.DriveService;
+import service.ReportService;
+import service.UserService;
+import utils.FileHelper;
 
 public class Main {
 
     public static void main(String[] args) {
+
         FileHelper.initializeFiles();
 
         Scanner scanner = new Scanner(System.in);
@@ -25,142 +23,137 @@ public class Main {
         UserService userService = new UserService();
         DriveService driveService = new DriveService();
         ApplicationService applicationService = new ApplicationService();
-        NotificationService notificationService = new NotificationService();
-        ReportService reportService = new ReportService(userService, driveService, applicationService);
+        ReportService reportService =
+                new ReportService(userService, driveService, applicationService);
 
         AuthMenu authMenu = new AuthMenu(scanner, userService);
 
-        StudentMenu studentMenu = new StudentMenu(scanner, userService, driveService,
-                applicationService, notificationService, reportService);
+        StudentMenu studentMenu =
+                new StudentMenu(scanner, userService, driveService,
+                        applicationService, reportService);
 
-        CompanyMenu companyMenu = new CompanyMenu(scanner, driveService,
-                applicationService, notificationService, userService);
+        CompanyMenu companyMenu =
+                new CompanyMenu(scanner, driveService,
+                        applicationService, userService);
 
-        AdminMenu adminMenu = new AdminMenu(scanner, userService, driveService,
-                applicationService, reportService);
+        AdminMenu adminMenu =
+                new AdminMenu(scanner, userService, driveService,
+                        applicationService, reportService);
 
-        int mainChoice = 0;
+        int choice = 0;
 
-        while (mainChoice != 4) {
-            UIHelper.printWelcomeBanner();
-            System.out.println("  Who are you?");
-            UIHelper.printLine();
-            UIHelper.printMenuItem(1, "Student");
-            UIHelper.printMenuItem(2, "Company");
-            UIHelper.printMenuItem(3, "Admin");
-            UIHelper.printMenuItem(4, "Exit");
-            UIHelper.printLine();
-            UIHelper.printChoicePrompt();
+        while (choice != 4) {
+
+            System.out.println("\n===== MAIN MENU =====");
+            System.out.println("1. Student");
+            System.out.println("2. Company");
+            System.out.println("3. Admin");
+            System.out.println("4. Exit");
+            System.out.print("Enter choice: ");
 
             try {
-                mainChoice = Integer.parseInt(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                UIHelper.printError("Please enter a valid number (1-4).");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid input");
                 continue;
             }
 
-            if (mainChoice == 1) {
-                // === STUDENT SECTION ===
-                handleStudentSection(scanner, authMenu, studentMenu);
+            if (choice == 1) {
+                studentSection(scanner, authMenu, studentMenu);
 
-            } else if (mainChoice == 2) {
-                // === COMPANY SECTION ===
-                handleCompanySection(scanner, authMenu, companyMenu);
+            } else if (choice == 2) {
+                companySection(scanner, authMenu, companyMenu);
 
-            } else if (mainChoice == 3) {
-                // === ADMIN SECTION ===
-                handleAdminSection(authMenu, adminMenu);
+            } else if (choice == 3) {
+                adminSection(authMenu, adminMenu);
 
-            } else if (mainChoice == 4) {
-                UIHelper.printThickLine();
-                System.out.println("  Thank you for using Smart Campus Placement System!");
-                System.out.println("  Best of luck with your placements!");
-                UIHelper.printThickLine();
+            } else if (choice == 4) {
+                System.out.println("Exiting... Thank you!");
+
             } else {
-                UIHelper.printError("Invalid choice. Please enter 1, 2, 3, or 4.");
+                System.out.println("Invalid choice");
             }
         }
 
         scanner.close();
     }
 
-    // Handle the student section - register or login
-    private static void handleStudentSection(Scanner scanner, AuthMenu authMenu,
-                                              StudentMenu studentMenu) {
-        UIHelper.printBlankLine();
-        UIHelper.printHeading("STUDENT PORTAL");
-        UIHelper.printMenuItem(1, "Register (New Student)");
-        UIHelper.printMenuItem(2, "Login (Existing Student)");
-        UIHelper.printMenuItem(3, "Back to Main Menu");
-        UIHelper.printLine();
-        UIHelper.printChoicePrompt();
+    // -------- STUDENT --------
+    private static void studentSection(Scanner scanner,
+                                       AuthMenu authMenu,
+                                       StudentMenu studentMenu) {
 
-        int choice = 0;
+        System.out.println("\n--- STUDENT ---");
+        System.out.println("1. Register");
+        System.out.println("2. Login");
+        System.out.println("3. Back");
+        System.out.print("Enter choice: ");
+
+        int ch = 0;
+
         try {
-            choice = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            UIHelper.printError("Invalid input.");
+            ch = Integer.parseInt(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid input");
             return;
         }
 
-        if (choice == 1) {
-            Student student = authMenu.registerStudent();
-            if (student != null) {
-                studentMenu.showMenu(student);
+        if (ch == 1) {
+            Student s = authMenu.registerStudent();
+            if (s != null) {
+                studentMenu.showMenu(s);
             }
-        } else if (choice == 2) {
-            Student student = authMenu.loginStudent();
-            if (student != null) {
-                studentMenu.showMenu(student);
+
+        } else if (ch == 2) {
+            Student s = authMenu.loginStudent();
+            if (s != null) {
+                studentMenu.showMenu(s);
             }
-        } else if (choice == 3) {
-            return;
-        } else {
-            UIHelper.printError("Invalid choice.");
         }
     }
 
-    // Handle the company section - register or login
-    private static void handleCompanySection(Scanner scanner, AuthMenu authMenu,
-                                              CompanyMenu companyMenu) {
-        UIHelper.printBlankLine();
-        UIHelper.printHeading("COMPANY PORTAL");
-        UIHelper.printMenuItem(1, "Register (New Company)");
-        UIHelper.printMenuItem(2, "Login (Existing Company)");
-        UIHelper.printMenuItem(3, "Back to Main Menu");
-        UIHelper.printLine();
-        UIHelper.printChoicePrompt();
+    // -------- COMPANY --------
+    private static void companySection(Scanner scanner,
+                                       AuthMenu authMenu,
+                                       CompanyMenu companyMenu) {
 
-        int choice = 0;
+        System.out.println("\n--- COMPANY ---");
+        System.out.println("1. Register");
+        System.out.println("2. Login");
+        System.out.println("3. Back");
+        System.out.print("Enter choice: ");
+
+        int ch = 0;
+
         try {
-            choice = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            UIHelper.printError("Invalid input.");
+            ch = Integer.parseInt(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid input");
             return;
         }
 
-        if (choice == 1) {
-            Company company = authMenu.registerCompany();
-            if (company != null) {
-                companyMenu.showMenu(company);
+        if (ch == 1) {
+            Company c = authMenu.registerCompany();
+            if (c != null) {
+                companyMenu.showMenu(c);
             }
-        } else if (choice == 2) {
-            Company company = authMenu.loginCompany();
-            if (company != null) {
-                companyMenu.showMenu(company);
+
+        } else if (ch == 2) {
+            Company c = authMenu.loginCompany();
+            if (c != null) {
+                companyMenu.showMenu(c);
             }
-        } else if (choice == 3) {
-            return;
-        } else {
-            UIHelper.printError("Invalid choice.");
         }
     }
 
-    // Handle the admin section - login only
-    private static void handleAdminSection(AuthMenu authMenu, AdminMenu adminMenu) {
-        Admin admin = authMenu.loginAdmin();
-        if (admin != null) {
-            adminMenu.showMenu(admin);
+    // -------- ADMIN --------
+    private static void adminSection(AuthMenu authMenu,
+                                     AdminMenu adminMenu) {
+
+        Admin a = authMenu.loginAdmin();
+
+        if (a != null) {
+            adminMenu.showMenu(a);
         }
     }
 }

@@ -33,7 +33,13 @@ javac -d out -sourcepath src \
     src/exceptions/InvalidLoginException.java \
     src/exceptions/UserAlreadyExistsException.java \
     src/exceptions/DriveNotFoundException.java \
-    src/exceptions/AlreadyAppliedException.java
+    src/exceptions/AlreadyAppliedException.java \
+    src/defaults/AdminsDefaultData.java \
+    src/defaults/CompaniesDefaultData.java \
+    src/defaults/StudentsDefaultData.java \
+    src/defaults/DrivesDefaultData.java \
+    src/defaults/ApplicationsDefaultData.java \
+    src/defaults/NotificationsDefaultData.java
 
 if [ $? -eq 0 ]; then
     echo ""

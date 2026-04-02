@@ -1,0 +1,2 @@
+NOTIF001,STU001,Welcome! Check eligible drives and your application status from the menu.,GENERAL,2026-04-01,false
+NOTIF002,STU002,New drive: Tata Motors GET for ME and related branches is now open.,NEW_DRIVE,2026-04-01,false

@@ -1,6 +1,5 @@
 package model;
 
-// Application class represents a student's application to a drive
 public class Application {
 
     private String applicationId;
@@ -9,29 +8,29 @@ public class Application {
     private String driveId;
     private String companyName;
     private String jobRole;
-    private String status;          // APPLIED, SHORTLISTED, REJECTED
+    private String status;         
     private String appliedDate;
 
-    // Constructor
-    public Application(String applicationId, String studentId, String studentName,
-                       String driveId, String companyName, String jobRole, String appliedDate) {
-        this.applicationId = applicationId;
-        this.studentId = studentId;
-        this.studentName = studentName;
-        this.driveId = driveId;
-        this.companyName = companyName;
-        this.jobRole = jobRole;
-        this.status = "APPLIED"; // Default status when first applied
-        this.appliedDate = appliedDate;
+
+    public Application(String appId, String sId, String sName,
+                   String dId, String compName, String jRole, String appDate) {
+
+        applicationId = appId;
+        studentId = sId;
+        studentName = sName;
+        driveId = dId;
+        companyName = compName;
+        jobRole = jRole;
+        status = "APPLIED";
+        appliedDate = appDate;
     }
 
-    // Getters and Setters
     public String getApplicationId() {
         return applicationId;
     }
 
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
+    public void setApplicationId(String appId) {
+        applicationId = appId;
     }
 
     public String getStudentId() {
@@ -42,8 +41,8 @@ public class Application {
         return studentName;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setStudentName(String sName) {
+        studentName = sName;
     }
 
     public String getDriveId() {
@@ -62,15 +61,15 @@ public class Application {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(String stat) {
+        status = stat;
     }
 
     public String getAppliedDate() {
         return appliedDate;
     }
 
-    // Print application details
+    
     public void printDetails() {
         System.out.println("  Application ID : " + applicationId);
         System.out.println("  Student        : " + studentName + " (" + studentId + ")");

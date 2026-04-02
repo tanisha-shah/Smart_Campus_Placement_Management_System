@@ -1,216 +1,173 @@
 package cli;
 
-import model.Student;
-import model.Company;
-import model.Admin;
-import service.UserService;
-import utils.UIHelper;
 import exceptions.InvalidLoginException;
 import exceptions.UserAlreadyExistsException;
-
 import java.util.Scanner;
+import model.Admin;
+import model.Company;
+import model.Student;
+import service.UserService;
 
-// AuthMenu handles registration and login for all user types
 public class AuthMenu {
 
     private Scanner scanner;
     private UserService userService;
 
-    public AuthMenu(Scanner scanner, UserService userService) {
-        this.scanner = scanner;
-        this.userService = userService;
+    public AuthMenu(Scanner sc, UserService us) {
+        scanner = sc;
+        userService = us;
     }
 
-    // ===================== STUDENT REGISTRATION =====================
-
+    // -------- STUDENT REGISTER --------
     public Student registerStudent() {
-        UIHelper.printSubHeading("STUDENT REGISTRATION");
+
+        System.out.println("\n--- STUDENT REGISTER ---");
 
         try {
-            System.out.print("  Full Name: ");
-            String name = scanner.nextLine().trim();
-            if (name.isEmpty()) {
-                UIHelper.printError("Name cannot be empty.");
-                return null;
-            }
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
 
-            System.out.print("  Email: ");
-            String email = scanner.nextLine().trim();
-            if (email.isEmpty() || !email.contains("@")) {
-                UIHelper.printError("Please enter a valid email address.");
-                return null;
-            }
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
 
-            System.out.print("  Password (min 6 chars): ");
-            String password = scanner.nextLine().trim();
-            if (password.length() < 6) {
-                UIHelper.printError("Password must be at least 6 characters long.");
-                return null;
-            }
+            System.out.print("Password: ");
+            String password = scanner.nextLine();
 
-            System.out.print("  Branch (e.g. CSE, IT, ECE, ME): ");
-            String branch = scanner.nextLine().trim().toUpperCase();
-            if (branch.isEmpty()) {
-                UIHelper.printError("Branch cannot be empty.");
-                return null;
-            }
+            System.out.print("Branch: ");
+            String branch = scanner.nextLine();
 
-            System.out.print("  CGPA (0.0 to 10.0): ");
-            double cgpa = Double.parseDouble(scanner.nextLine().trim());
-            if (cgpa < 0 || cgpa > 10) {
-                UIHelper.printError("CGPA must be between 0.0 and 10.0.");
-                return null;
-            }
+            System.out.print("CGPA: ");
+            double cgpa = Double.parseDouble(scanner.nextLine());
 
-            System.out.print("  Number of Active Backlogs: ");
-            int backlogs = Integer.parseInt(scanner.nextLine().trim());
-            if (backlogs < 0) {
-                UIHelper.printError("Backlogs cannot be negative.");
-                return null;
-            }
+            System.out.print("Backlogs: ");
+            int backlogs = Integer.parseInt(scanner.nextLine());
 
-            // Generate unique student ID
-            String studentId = UIHelper.generateId("STU");
-            Student student = new Student(studentId, name, email, password, branch, cgpa, backlogs);
+            String id = "STU" + System.currentTimeMillis();
 
-            // Ask for initial skills (optional)
-            System.out.print("  Add your skills (comma-separated, or press Enter to skip): ");
-            String skillInput = scanner.nextLine().trim();
-            if (!skillInput.isEmpty()) {
-                String[] skills = skillInput.split(",");
-                for (int i = 0; i < skills.length; i++) {
-                    student.addSkill(skills[i].trim());
+            Student s = new Student(id, name, email, password, branch, cgpa, backlogs);
+
+            System.out.print("Skills (comma or blank): ");
+            String input = scanner.nextLine();
+
+            if (!input.equals("")) {
+                String[] arr = input.split(",");
+                for (int i = 0; i < arr.length; i++) {
+                    s.addSkill(arr[i].trim());   // trimmed (small improvement)
                 }
             }
 
-            userService.registerStudent(student);
-            return student;
+            userService.registerStudent(s);
+            System.out.println("Student registered");
 
-        } catch (NumberFormatException e) {
-            UIHelper.printError("Invalid number format. Please enter correct values.");
-            return null;
-        } catch (UserAlreadyExistsException e) {
-            UIHelper.printError(e.getMessage());
+            return s;
+
+        } catch (Exception e) {
+            System.out.println("Error in registration");
             return null;
         }
     }
 
-    // ===================== STUDENT LOGIN =====================
-
+    // -------- STUDENT LOGIN --------
     public Student loginStudent() {
-        UIHelper.printSubHeading("STUDENT LOGIN");
 
-        System.out.print("  Email: ");
-        String email = scanner.nextLine().trim();
+        System.out.println("\n--- STUDENT LOGIN ---");
 
-        System.out.print("  Password: ");
-        String password = scanner.nextLine().trim();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
 
         try {
-            Student student = userService.loginStudent(email, password);
-            UIHelper.printSuccess("Login successful! Welcome back, " + student.getName() + "!");
-            return student;
+            Student s = userService.loginStudent(email, password);
+            System.out.println("Login success");
+            return s;
         } catch (InvalidLoginException e) {
-            UIHelper.printError(e.getMessage());
+            System.out.println("Invalid login");
             return null;
         }
     }
 
-    // ===================== COMPANY REGISTRATION =====================
-
+    // -------- COMPANY REGISTER --------
     public Company registerCompany() {
-        UIHelper.printSubHeading("COMPANY REGISTRATION");
+
+        System.out.println("\n--- COMPANY REGISTER ---");
 
         try {
-            System.out.print("  Contact Person Name: ");
-            String name = scanner.nextLine().trim();
-            if (name.isEmpty()) {
-                UIHelper.printError("Name cannot be empty.");
-                return null;
-            }
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
 
-            System.out.print("  Email: ");
-            String email = scanner.nextLine().trim();
-            if (email.isEmpty() || !email.contains("@")) {
-                UIHelper.printError("Please enter a valid email address.");
-                return null;
-            }
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
 
-            System.out.print("  Password (min 6 chars): ");
-            String password = scanner.nextLine().trim();
-            if (password.length() < 6) {
-                UIHelper.printError("Password must be at least 6 characters.");
-                return null;
-            }
+            System.out.print("Password: ");
+            String password = scanner.nextLine();
 
-            System.out.print("  Company Name: ");
-            String companyName = scanner.nextLine().trim();
-            if (companyName.isEmpty()) {
-                UIHelper.printError("Company name cannot be empty.");
-                return null;
-            }
+            System.out.print("Company Name: ");
+            String cname = scanner.nextLine();
 
-            System.out.print("  Industry (e.g. IT, Finance, Healthcare): ");
-            String industry = scanner.nextLine().trim();
-            if (industry.isEmpty()) industry = "Not Specified";
+            System.out.print("Industry: ");
+            String industry = scanner.nextLine();
 
-            System.out.print("  HR Contact Person: ");
-            String contactPerson = scanner.nextLine().trim();
-            if (contactPerson.isEmpty()) contactPerson = name;
+            System.out.print("Contact Person: ");
+            String contact = scanner.nextLine();
 
-            String companyId = UIHelper.generateId("CMP");
-            Company company = new Company(companyId, name, email, password,
-                    companyName, industry, contactPerson);
+            String id = "CMP" + System.currentTimeMillis();
 
-            userService.registerCompany(company);
-            return company;
+            Company c = new Company(id, name, email, password, cname, industry, contact);
+
+            userService.registerCompany(c);
+            System.out.println("Company registered");
+
+            return c;
 
         } catch (UserAlreadyExistsException e) {
-            UIHelper.printError(e.getMessage());
+            System.out.println("Company already exists");
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error in registration");
             return null;
         }
     }
 
-    // ===================== COMPANY LOGIN =====================
-
+    // -------- COMPANY LOGIN --------
     public Company loginCompany() {
-        UIHelper.printSubHeading("COMPANY LOGIN");
 
-        System.out.print("  Email: ");
-        String email = scanner.nextLine().trim();
+        System.out.println("\n--- COMPANY LOGIN ---");
 
-        System.out.print("  Password: ");
-        String password = scanner.nextLine().trim();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
 
         try {
-            Company company = userService.loginCompany(email, password);
-            UIHelper.printSuccess("Login successful! Welcome, " + company.getCompanyName() + "!");
-            return company;
+            Company c = userService.loginCompany(email, password);
+            System.out.println("Login success");
+            return c;
         } catch (InvalidLoginException e) {
-            UIHelper.printError(e.getMessage());
+            System.out.println("Invalid login");
             return null;
         }
     }
 
-    // ===================== ADMIN LOGIN =====================
-
+    // -------- ADMIN LOGIN --------
     public Admin loginAdmin() {
-        UIHelper.printSubHeading("ADMIN LOGIN");
-        System.out.println("  [Default Admin: admin@campus.edu / admin123]");
-        UIHelper.printLine();
 
-        System.out.print("  Email: ");
-        String email = scanner.nextLine().trim();
+        System.out.println("\n--- ADMIN LOGIN ---");
 
-        System.out.print("  Password: ");
-        String password = scanner.nextLine().trim();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
 
         try {
-            Admin admin = userService.loginAdmin(email, password);
-            UIHelper.printSuccess("Admin login successful! Welcome, " + admin.getName() + "!");
-            return admin;
+            Admin a = userService.loginAdmin(email, password);
+            System.out.println("Admin login success");
+            return a;
         } catch (InvalidLoginException e) {
-            UIHelper.printError(e.getMessage());
+            System.out.println("Invalid login");
             return null;
         }
     }

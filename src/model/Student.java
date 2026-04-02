@@ -9,29 +9,29 @@ public class Student extends User {
     private ArrayList<String> skills;
     private int backlogs;
 
-    public Student(String userId, String name, String email, String password,
-                   String branch, double cgpa, int backlogs) {
-        super(userId, name, email, password, "STUDENT");
-        this.branch = branch;
-        this.cgpa = cgpa;
-        this.backlogs = backlogs;
-        this.skills = new ArrayList<String>();
+    public Student(String uId, String n, String em, String p,
+                   String b, double cg, int bl) {
+        super(uId, n, em, p, "STUDENT");
+        branch = b;
+        cgpa = cg;
+        backlogs = bl;
+        skills = new ArrayList<String>();
     }
 
     public String getBranch() {
         return branch;
     }
 
-    public void setBranch(String branch) {
-        this.branch = branch;
+    public void setBranch(String b) {
+        branch = b;
     }
 
     public double getCgpa() {
         return cgpa;
     }
 
-    public void setCgpa(double cgpa) {
-        this.cgpa = cgpa;
+    public void setCgpa(double cg) {
+        cgpa = cg;
     }
 
     public ArrayList<String> getSkills() {
@@ -50,22 +50,24 @@ public class Student extends User {
         return backlogs;
     }
 
-    public void setBacklogs(int backlogs) {
-        this.backlogs = backlogs;
+    public void setBacklogs(int bl) {
+        backlogs = bl;
     }
 
     public int getResumeScore() {
         int score = 0;
-
+        //cgpa
+        // total cg ka 50 marks to score me add karenge
         score += (int)(cgpa / 10.0 * 50);
 
+        //skills
         int skillPoints = skills.size() * 5;
         if (skillPoints > 40) {
             skillPoints = 40;
         }
         score += skillPoints;
 
-        // No backlogs gives 10 bonus points
+        //check backlogs
         if (backlogs == 0) {
             score += 10;
         }
@@ -73,7 +75,7 @@ public class Student extends User {
         return score;
     }
 
-    // Override parent method - Dynamic Method Dispatch
+    //Dynamic Method Dispatch
     public String getDisplayInfo() {
         return "Student ID: " + getUserId() + " | Name: " + getName()
                 + " | Branch: " + branch + " | CGPA: " + cgpa
@@ -82,14 +84,18 @@ public class Student extends User {
 
     // Convert skills list to comma-separated string for file storage
     public String getSkillsAsString() {
+
         if (skills.isEmpty()) {
             return "NONE";
         }
+
         String result = "";
+
         for (int i = 0; i < skills.size(); i++) {
+
             result += skills.get(i);
             if (i < skills.size() - 1) {
-                result += ";";
+                result = result + ";";
             }
         }
         return result;

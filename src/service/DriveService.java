@@ -1,183 +1,183 @@
 package service;
 
+import exceptions.DriveNotFoundException;
+import java.util.ArrayList;
 import model.Drive;
 import model.Student;
 import utils.FileHelper;
-import utils.UIHelper;
-import exceptions.DriveNotFoundException;
 
-import java.util.ArrayList;
-
-// DriveService handles all drive-related operations
 public class DriveService {
 
-    // Post a new drive (company posts it)
+    // POST DRIVE
     public void postDrive(Drive drive) {
         FileHelper.writeLineToFile(FileHelper.DRIVES_FILE, drive.toFileString());
-        UIHelper.printSuccess("Drive posted successfully! Drive ID: " + drive.getDriveId());
+        System.out.println("Drive posted successfully! ID: " + drive.getDriveId());
     }
 
-    // Get ALL drives from file
+    // GET ALL DRIVES
     public ArrayList<Drive> getAllDrives() {
-        ArrayList<Drive> drives = new ArrayList<Drive>();
+
+        ArrayList<Drive> drives = new ArrayList<>();
         ArrayList<String> lines = FileHelper.readAllLines(FileHelper.DRIVES_FILE);
+
         for (int i = 0; i < lines.size(); i++) {
-            Drive drive = parseDriveFromLine(lines.get(i));
-            if (drive != null) {
-                drives.add(drive);
+            Drive d = parseDrive(lines.get(i));
+            if (d != null) {
+                drives.add(d);
             }
         }
         return drives;
     }
 
-    // Get only ACTIVE drives
+    // GET ACTIVE DRIVES
     public ArrayList<Drive> getActiveDrives() {
-        ArrayList<Drive> allDrives = getAllDrives();
-        ArrayList<Drive> activeDrives = new ArrayList<Drive>();
-        for (int i = 0; i < allDrives.size(); i++) {
-            if (allDrives.get(i).getStatus().equals("ACTIVE")) {
-                activeDrives.add(allDrives.get(i));
+
+        ArrayList<Drive> all = getAllDrives();
+        ArrayList<Drive> active = new ArrayList<>();
+
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getStatus().equals("ACTIVE")) {
+                active.add(all.get(i));
             }
         }
-        return activeDrives;
+        return active;
     }
 
-    // Get drives posted by a specific company
+    // GET DRIVES BY COMPANY
     public ArrayList<Drive> getDrivesByCompany(String companyId) {
-        ArrayList<Drive> allDrives = getAllDrives();
-        ArrayList<Drive> companyDrives = new ArrayList<Drive>();
-        for (int i = 0; i < allDrives.size(); i++) {
-            if (allDrives.get(i).getCompanyId().equals(companyId)) {
-                companyDrives.add(allDrives.get(i));
+
+        ArrayList<Drive> all = getAllDrives();
+        ArrayList<Drive> list = new ArrayList<>();
+
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getCompanyId().equals(companyId)) {
+                list.add(all.get(i));
             }
         }
-        return companyDrives;
+        return list;
     }
 
-    // Get drives that a student is ELIGIBLE for based on their profile
-    public ArrayList<Drive> getEligibleDrives(Student student) {
-        ArrayList<Drive> activeDrives = getActiveDrives();
-        ArrayList<Drive> eligibleDrives = new ArrayList<Drive>();
+    // ELIGIBLE DRIVES
+    public ArrayList<Drive> getEligibleDrives(Student s) {
 
-        for (int i = 0; i < activeDrives.size(); i++) {
-            Drive drive = activeDrives.get(i);
+        ArrayList<Drive> active = getActiveDrives();
+        ArrayList<Drive> result = new ArrayList<>();
 
-            // Check CGPA requirement
-            if (student.getCgpa() < drive.getMinCgpa()) {
-                continue; // Not eligible - skip this drive
-            }
+        for (int i = 0; i < active.size(); i++) {
 
-            // Check backlogs requirement
-            if (student.getBacklogs() > drive.getMaxBacklogs()) {
-                continue; // Not eligible - skip this drive
-            }
+            Drive d = active.get(i);
 
-            // Check branch eligibility (if drive is not open to ALL)
-            String branchStr = drive.getBranchesAsString();
+            if (s.getCgpa() < d.getMinCgpa()) continue;
+            if (s.getBacklogs() > d.getMaxBacklogs()) continue;
+
+            String branchStr = d.getBranchesAsString();
+
             if (!branchStr.equals("ALL")) {
-                ArrayList<String> branches = drive.getEligibleBranches();
-                boolean branchEligible = false;
+
+                ArrayList<String> branches = d.getEligibleBranches();
+                boolean ok = false;
+
                 for (int j = 0; j < branches.size(); j++) {
-                    if (branches.get(j).equalsIgnoreCase(student.getBranch())) {
-                        branchEligible = true;
+                    if (branches.get(j).equalsIgnoreCase(s.getBranch())) {
+                        ok = true;
                         break;
                     }
                 }
-                if (!branchEligible) {
-                    continue; // Branch not eligible
-                }
+
+                if (!ok) continue;
             }
 
-            // Student is eligible for this drive
-            eligibleDrives.add(drive);
+            result.add(d);
         }
-        return eligibleDrives;
+
+        return result;
     }
 
-    // Find drive by ID
-    public Drive getDriveById(String driveId) throws DriveNotFoundException {
-        ArrayList<Drive> drives = getAllDrives();
-        for (int i = 0; i < drives.size(); i++) {
-            if (drives.get(i).getDriveId().equals(driveId)) {
-                return drives.get(i);
+    // GET DRIVE BY ID
+    public Drive getDriveById(String id) throws DriveNotFoundException {
+
+        ArrayList<Drive> list = getAllDrives();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getDriveId().equals(id)) {
+                return list.get(i);
             }
         }
-        throw new DriveNotFoundException("Drive not found with ID: " + driveId);
+
+        throw new DriveNotFoundException("Drive not found");
     }
 
-    // Analyze skill gap - return list of missing skills for a drive
-    public ArrayList<String> analyzeSkillGap(Student student, Drive drive) {
-        ArrayList<String> missingSkills = new ArrayList<String>();
-        ArrayList<String> requiredSkills = drive.getRequiredSkills();
-        ArrayList<String> studentSkills = student.getSkills();
+    // SKILL GAP
+    public ArrayList<String> analyzeSkillGap(Student s, Drive d) {
 
-        for (int i = 0; i < requiredSkills.size(); i++) {
-            String required = requiredSkills.get(i).toLowerCase();
-            boolean hasSkill = false;
-            for (int j = 0; j < studentSkills.size(); j++) {
-                if (studentSkills.get(j).toLowerCase().equals(required)) {
-                    hasSkill = true;
+        ArrayList<String> missing = new ArrayList<>();
+
+        ArrayList<String> req = d.getRequiredSkills();
+        ArrayList<String> stu = s.getSkills();
+
+        for (int i = 0; i < req.size(); i++) {
+
+            String r = req.get(i).toLowerCase();
+            boolean found = false;
+
+            for (int j = 0; j < stu.size(); j++) {
+                if (stu.get(j).toLowerCase().equals(r)) {
+                    found = true;
                     break;
                 }
             }
-            if (!hasSkill) {
-                missingSkills.add(requiredSkills.get(i));
+
+            if (!found) {
+                missing.add(req.get(i));
             }
         }
-        return missingSkills;
+
+        return missing;
     }
 
-    // Get total drive count
+    // COUNT
     public int getDriveCount() {
         return getAllDrives().size();
     }
 
-    // Parse a Drive object from a CSV line
-    private Drive parseDriveFromLine(String line) {
+    // PARSE CSV
+    private Drive parseDrive(String line) {
+
         try {
-            String[] parts = line.split(",");
-            // Format: driveId,companyId,companyName,jobRole,ctc,minCgpa,maxBacklogs,
-            //         driveDate,location,jobType,status,branches,skills
-            if (parts.length < 13) return null;
+            String[] p = line.split(",");
 
-            String driveId = parts[0];
-            String companyId = parts[1];
-            String companyName = parts[2];
-            String jobRole = parts[3];
-            double ctc = Double.parseDouble(parts[4]);
-            double minCgpa = Double.parseDouble(parts[5]);
-            int maxBacklogs = Integer.parseInt(parts[6]);
-            String driveDate = parts[7];
-            String location = parts[8];
-            String jobType = parts[9];
-            String status = parts[10];
-            String branchStr = parts[11];
-            String skillStr = parts[12];
+            if (p.length < 13) return null;
 
-            Drive drive = new Drive(driveId, companyId, companyName, jobRole,
-                    ctc, minCgpa, maxBacklogs, driveDate, location, jobType);
-            drive.setStatus(status);
+            Drive d = new Drive(
+                    p[0], p[1], p[2], p[3],
+                    Double.parseDouble(p[4]),
+                    Double.parseDouble(p[5]),
+                    Integer.parseInt(p[6]),
+                    p[7], p[8], p[9]
+            );
 
-            // Parse branches
-            if (!branchStr.equals("ALL")) {
-                String[] branchArr = branchStr.split(";");
-                for (int i = 0; i < branchArr.length; i++) {
-                    drive.addEligibleBranch(branchArr[i].trim());
+            d.setStatus(p[10]);
+
+            // branches
+            if (!p[11].equals("ALL")) {
+                String[] b = p[11].split(";");
+                for (int i = 0; i < b.length; i++) {
+                    d.addEligibleBranch(b[i]);
                 }
             }
 
-            // Parse skills
-            if (!skillStr.equals("NONE")) {
-                String[] skillArr = skillStr.split(";");
-                for (int i = 0; i < skillArr.length; i++) {
-                    drive.addRequiredSkill(skillArr[i].trim());
+            // skills
+            if (!p[12].equals("NONE")) {
+                String[] s = p[12].split(";");
+                for (int i = 0; i < s.length; i++) {
+                    d.addRequiredSkill(s[i]);
                 }
             }
 
-            return drive;
+            return d;
 
         } catch (Exception e) {
-            return null; // Skip malformed lines
+            return null;
         }
     }
 }
