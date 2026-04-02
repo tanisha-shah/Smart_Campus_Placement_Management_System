@@ -8,43 +8,43 @@ import model.Company;
 import model.Student;
 import service.ApplicationService;
 import service.DriveService;
-import service.ReportService;
 import service.UserService;
-import utils.FileHelper;
+import service.ReportService;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        FileHelper.initializeFiles();
+        Scanner sc = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
-
+        // create service objects
         UserService userService = new UserService();
         DriveService driveService = new DriveService();
         ApplicationService applicationService = new ApplicationService();
-        ReportService reportService =
-                new ReportService(userService, driveService, applicationService);
 
-        AuthMenu authMenu = new AuthMenu(scanner, userService);
+        // menus
+        AuthMenu authMenu = new AuthMenu(sc, userService);
+
+        ReportService reportService =
+        new ReportService(userService, driveService, applicationService);
 
         StudentMenu studentMenu =
-                new StudentMenu(scanner, userService, driveService,
-                        applicationService, reportService);
-
-        CompanyMenu companyMenu =
-                new CompanyMenu(scanner, driveService,
-                        applicationService, userService);
+        new StudentMenu(sc, userService, driveService, applicationService, reportService);
 
         AdminMenu adminMenu =
-                new AdminMenu(scanner, userService, driveService,
-                        applicationService, reportService);
+        new AdminMenu(sc, userService, driveService, applicationService, reportService);
+
+        CompanyMenu companyMenu =
+                new CompanyMenu(sc, driveService, applicationService, userService);
 
         int choice = 0;
 
+        // main menu loop
         while (choice != 4) {
+            System.out.println("\n======================================");
+            System.out.println(" SMART CAMPUS PLACEMENT SYSTEM ");
+            System.out.println("======================================");
 
-            System.out.println("\n===== MAIN MENU =====");
             System.out.println("1. Student");
             System.out.println("2. Company");
             System.out.println("3. Admin");
@@ -52,34 +52,34 @@ public class Main {
             System.out.print("Enter choice: ");
 
             try {
-                choice = Integer.parseInt(scanner.nextLine());
+                choice = Integer.parseInt(sc.nextLine());
             } catch (Exception e) {
                 System.out.println("Invalid input");
                 continue;
             }
 
             if (choice == 1) {
-                studentSection(scanner, authMenu, studentMenu);
+                studentSection(sc, authMenu, studentMenu);
 
             } else if (choice == 2) {
-                companySection(scanner, authMenu, companyMenu);
+                companySection(sc, authMenu, companyMenu);
 
             } else if (choice == 3) {
                 adminSection(authMenu, adminMenu);
 
             } else if (choice == 4) {
-                System.out.println("Exiting... Thank you!");
+                System.out.println("Exiting...");
 
             } else {
                 System.out.println("Invalid choice");
             }
         }
 
-        scanner.close();
+        sc.close();
     }
 
     // -------- STUDENT --------
-    private static void studentSection(Scanner scanner,
+    private static void studentSection(Scanner sc,
                                        AuthMenu authMenu,
                                        StudentMenu studentMenu) {
 
@@ -92,7 +92,7 @@ public class Main {
         int ch = 0;
 
         try {
-            ch = Integer.parseInt(scanner.nextLine());
+            ch = Integer.parseInt(sc.nextLine());
         } catch (Exception e) {
             System.out.println("Invalid input");
             return;
@@ -113,7 +113,7 @@ public class Main {
     }
 
     // -------- COMPANY --------
-    private static void companySection(Scanner scanner,
+    private static void companySection(Scanner sc,
                                        AuthMenu authMenu,
                                        CompanyMenu companyMenu) {
 
@@ -126,7 +126,7 @@ public class Main {
         int ch = 0;
 
         try {
-            ch = Integer.parseInt(scanner.nextLine());
+            ch = Integer.parseInt(sc.nextLine());
         } catch (Exception e) {
             System.out.println("Invalid input");
             return;

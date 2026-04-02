@@ -9,6 +9,7 @@ public class Student extends User {
     private ArrayList<String> skills;
     private int backlogs;
 
+    // constructor
     public Student(String uId, String n, String em, String p,
                    String b, double cg, int bl) {
         super(uId, n, em, p, "STUDENT");
@@ -42,8 +43,9 @@ public class Student extends User {
         this.skills = skills;
     }
 
+    // add skill
     public void addSkill(String skill) {
-        this.skills.add(skill.trim().toLowerCase());
+        skills.add(skill.trim().toLowerCase());
     }
 
     public int getBacklogs() {
@@ -54,54 +56,48 @@ public class Student extends User {
         backlogs = bl;
     }
 
+    // simple resume score
     public int getResumeScore() {
         int score = 0;
-        //cgpa
-        // total cg ka 50 marks to score me add karenge
-        score += (int)(cgpa / 10.0 * 50);
 
-        //skills
-        int skillPoints = skills.size() * 5;
-        if (skillPoints > 40) {
-            skillPoints = 40;
-        }
-        score += skillPoints;
-
-        //check backlogs
-        if (backlogs == 0) {
-            score += 10;
-        }
+        score += (int)(cgpa * 10);          // cgpa part
+        score += skills.size() * 5;         // skills
+        score -= backlogs * 2;              // penalty
 
         return score;
     }
 
-    //Dynamic Method Dispatch
+    // display student info
     public String getDisplayInfo() {
-        return "Student ID: " + getUserId() + " | Name: " + getName()
-                + " | Branch: " + branch + " | CGPA: " + cgpa
-                + " | Backlogs: " + backlogs + " | Skills: " + skills.toString();
+        return "Student ID: " + getUserId() +
+                " | Name: " + getName() +
+                " | Branch: " + branch +
+                " | CGPA: " + cgpa +
+                " | Backlogs: " + backlogs +
+                " | Skills: " + skills;
     }
 
-    // Convert skills list to comma-separated string for file storage
+    // convert skills list to string
     public String getSkillsAsString() {
 
-        if (skills.isEmpty()) {
+        if (skills.size() == 0) {
             return "NONE";
         }
 
-        String result = "";
+        String res = "";
 
         for (int i = 0; i < skills.size(); i++) {
+            res += skills.get(i);
 
-            result += skills.get(i);
-            if (i < skills.size() - 1) {
-                result = result + ";";
+            if (i != skills.size() - 1) {
+                res += ";";
             }
         }
-        return result;
+
+        return res;
     }
 
-    // Convert to file-safe string
+    // convert to file string
     public String toFileString() {
         return getUserId() + "," + getName() + "," + getEmail() + ","
                 + getPassword() + ",STUDENT," + branch + "," + cgpa + ","

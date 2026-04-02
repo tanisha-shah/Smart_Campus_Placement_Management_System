@@ -1,95 +1,145 @@
 package service;
 
-import exceptions.InvalidLoginException;
-import exceptions.UserAlreadyExistsException;
 import java.util.ArrayList;
+import java.io.*;
+import java.util.Scanner;
 import model.Admin;
 import model.Company;
 import model.Student;
-import utils.FileHelper;
 
 public class UserService {
 
-    // REGISTER STUDENT
-    public void registerStudent(Student student) throws UserAlreadyExistsException {
+    // ---------- STUDENT ----------
+
+    public void registerStudent(Student student) {
 
         if (emailExists(student.getEmail())) {
-            throw new UserAlreadyExistsException("Email already exists");
+            System.out.println("Email already exists");
+            return;
         }
 
-        FileHelper.writeLineToFile(FileHelper.STUDENTS_FILE, student.toFileString());
-        System.out.println("Student registered. ID: " + student.getUserId());
+        try {
+            FileWriter fw = new FileWriter("data/students.txt", true);
+            fw.write(student.toFileString());
+            fw.write("\n");
+            fw.close();
+
+            System.out.println("Student registered. ID: " + student.getUserId());
+
+        } catch (Exception e) {
+            System.out.println("Error writing file");
+        }
     }
 
-    // LOGIN STUDENT
-    public Student loginStudent(String email, String password) throws InvalidLoginException {
+    public Student loginStudent(String email, String password) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.STUDENTS_FILE);
+        try {
+            File file = new File("data/students.txt");
+            Scanner sc = new Scanner(file);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] p = line.split(",");
 
-            if (p.length >= 9) {
-                if (p[2].equals(email) && p[3].equals(password)) {
-                    return parseStudent(p);
+                if (p.length >= 9) {
+                    if (p[2].equals(email) && p[3].equals(password)) {
+                        sc.close();
+                        return parseStudent(p);
+                    }
                 }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
-        throw new InvalidLoginException("Invalid login");
+        System.out.println("Invalid login");
+        return null;
     }
 
-    // GET ALL STUDENTS
     public ArrayList<Student> getAllStudents() {
 
         ArrayList<Student> list = new ArrayList<>();
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.STUDENTS_FILE);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
-            if (p.length >= 9) {
-                list.add(parseStudent(p));
+        try {
+            File file = new File("data/students.txt");
+            Scanner sc = new Scanner(file);
+
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(",");
+
+                if (p.length >= 9) {
+                    list.add(parseStudent(p));
+                }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
         return list;
     }
 
-    // GET STUDENT BY ID
     public Student getStudentById(String id) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.STUDENTS_FILE);
+        try {
+            File file = new File("data/students.txt");
+            Scanner sc = new Scanner(file);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
-            if (p.length >= 9 && p[0].equals(id)) {
-                return parseStudent(p);
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(",");
+
+                if (p.length >= 9 && p[0].equals(id)) {
+                    sc.close();
+                    return parseStudent(p);
+                }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
         return null;
     }
 
-    // UPDATE STUDENT
     public void updateStudent(Student s) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.STUDENTS_FILE);
         ArrayList<String> updated = new ArrayList<>();
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
+        try {
+            File file = new File("data/students.txt");
+            Scanner sc = new Scanner(file);
 
-            if (p[0].equals(s.getUserId())) {
-                updated.add(s.toFileString());
-            } else {
-                updated.add(lines.get(i));
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] p = line.split(",");
+
+                if (p[0].equals(s.getUserId())) {
+                    updated.add(s.toFileString());
+                } else {
+                    updated.add(line);
+                }
             }
-        }
 
-        FileHelper.writeAllLines(FileHelper.STUDENTS_FILE, updated);
+            sc.close();
+
+            FileWriter fw = new FileWriter("data/students.txt");
+            for (int i = 0; i < updated.size(); i++) {
+                fw.write(updated.get(i) + "\n");
+            }
+            fw.close();
+
+        } catch (Exception e) {
+            System.out.println("Error updating file");
+        }
     }
 
-    // PARSE STUDENT
     private Student parseStudent(String[] p) {
 
         double cgpa = 0;
@@ -112,94 +162,145 @@ public class UserService {
         return s;
     }
 
-    // ================= COMPANY =================
+    // ---------- COMPANY ----------
 
-    public void registerCompany(Company c) throws UserAlreadyExistsException {
+    public void registerCompany(Company c) {
 
         if (emailExists(c.getEmail())) {
-            throw new UserAlreadyExistsException("Email already exists");
+            System.out.println("Email already exists");
+            return;
         }
 
-        FileHelper.writeLineToFile(FileHelper.COMPANIES_FILE, c.toFileString());
-        System.out.println("Company registered. ID: " + c.getUserId());
+        try {
+            FileWriter fw = new FileWriter("data/companies.txt", true);
+            fw.write(c.toFileString() + "\n");
+            fw.close();
+
+            System.out.println("Company registered. ID: " + c.getUserId());
+
+        } catch (Exception e) {
+            System.out.println("Error writing file");
+        }
     }
 
-    public Company loginCompany(String email, String password) throws InvalidLoginException {
+    public Company loginCompany(String email, String password) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.COMPANIES_FILE);
+        try {
+            File file = new File("data/companies.txt");
+            Scanner sc = new Scanner(file);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(",");
 
-            if (p.length >= 8) {
-                if (p[2].equals(email) && p[3].equals(password)) {
-                    return new Company(p[0], p[1], p[2], p[3], p[5], p[6], p[7]);
+                if (p.length >= 8) {
+                    if (p[2].equals(email) && p[3].equals(password)) {
+                        sc.close();
+                        return new Company(p[0], p[1], p[2], p[3], p[5], p[6], p[7]);
+                    }
                 }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
-        throw new InvalidLoginException("Invalid login");
+        System.out.println("Invalid login");
+        return null;
     }
 
     public ArrayList<Company> getAllCompanies() {
 
         ArrayList<Company> list = new ArrayList<>();
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.COMPANIES_FILE);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
+        try {
+            File file = new File("data/companies.txt");
+            Scanner sc = new Scanner(file);
 
-            if (p.length >= 8) {
-                list.add(new Company(p[0], p[1], p[2], p[3], p[5], p[6], p[7]));
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(",");
+
+                if (p.length >= 8) {
+                    list.add(new Company(p[0], p[1], p[2], p[3], p[5], p[6], p[7]));
+                }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
         return list;
     }
 
-    // ================= ADMIN =================
+    // ---------- ADMIN ----------
 
-    public Admin loginAdmin(String email, String password) throws InvalidLoginException {
+    public Admin loginAdmin(String email, String password) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.ADMINS_FILE);
+        try {
+            File file = new File("data/admins.txt");
+            Scanner sc = new Scanner(file);
 
-        for (int i = 0; i < lines.size(); i++) {
-            String[] p = lines.get(i).split(",");
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(",");
 
-            if (p.length >= 6) {
-                if (p[2].equals(email) && p[3].equals(password)) {
-                    return new Admin(p[0], p[1], p[2], p[3], p[5]);
+                if (p.length >= 6) {
+                    if (p[2].equals(email) && p[3].equals(password)) {
+                        sc.close();
+                        return new Admin(p[0], p[1], p[2], p[3], p[5]);
+                    }
                 }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
-        throw new InvalidLoginException("Invalid admin login");
+        System.out.println("Invalid admin login");
+        return null;
     }
 
-    // ================= COMMON =================
+    // ---------- COMMON ----------
 
     private boolean emailExists(String email) {
 
-        ArrayList<String> s = FileHelper.readAllLines(FileHelper.STUDENTS_FILE);
-        for (int i = 0; i < s.size(); i++) {
-            String[] p = s.get(i).split(",");
-            if (p.length > 2 && p[2].equals(email)) return true;
-        }
+        try {
+            Scanner sc1 = new Scanner(new File("data/students.txt"));
+            while (sc1.hasNextLine()) {
+                String[] p = sc1.nextLine().split(",");
+                if (p.length > 2 && p[2].equals(email)) {
+                    sc1.close();
+                    return true;
+                }
+            }
+            sc1.close();
 
-        ArrayList<String> c = FileHelper.readAllLines(FileHelper.COMPANIES_FILE);
-        for (int i = 0; i < c.size(); i++) {
-            String[] p = c.get(i).split(",");
-            if (p.length > 2 && p[2].equals(email)) return true;
+            Scanner sc2 = new Scanner(new File("data/companies.txt"));
+            while (sc2.hasNextLine()) {
+                String[] p = sc2.nextLine().split(",");
+                if (p.length > 2 && p[2].equals(email)) {
+                    sc2.close();
+                    return true;
+                }
+            }
+            sc2.close();
+
+        } catch (Exception e) {
+            System.out.println("Error checking email");
         }
 
         return false;
     }
 
     public int getStudentCount() {
-        return FileHelper.readAllLines(FileHelper.STUDENTS_FILE).size();
+        return getAllStudents().size();
     }
 
     public int getCompanyCount() {
-        return FileHelper.readAllLines(FileHelper.COMPANIES_FILE).size();
+        return getAllCompanies().size();
     }
 }

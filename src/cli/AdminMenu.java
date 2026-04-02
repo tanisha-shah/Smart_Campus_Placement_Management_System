@@ -12,7 +12,6 @@ import service.DriveService;
 import service.ReportService;
 import service.UserService;
 
-
 public class AdminMenu {
 
     private Scanner scanner;
@@ -23,7 +22,7 @@ public class AdminMenu {
     private Admin loggedInAdmin;
 
     public AdminMenu(Scanner sc, UserService us, DriveService ds,
-                 ApplicationService as, ReportService rs) {
+                     ApplicationService as, ReportService rs) {
 
         scanner = sc;
         userService = us;
@@ -32,134 +31,110 @@ public class AdminMenu {
         reportService = rs;
     }
 
-
-   public void showMenu(Admin adminObj) {
+    public void showMenu(Admin adminObj) {
 
         loggedInAdmin = adminObj;
         int choice = 0;
 
         while (choice != 7) {
 
-            System.out.println();
-            System.out.println("========== ADMIN PANEL ==========");
+            System.out.println("\n========== ADMIN PANEL ==========");
             System.out.println("Welcome, " + loggedInAdmin.getName());
-            System.out.println("1. View All Registered Students");
-            System.out.println("2. View All Registered Companies");
-            System.out.println("3. View All Campus Drives");
-            System.out.println("4. View All Applications");
-            System.out.println("5. View Student Profile Details");
-            System.out.println("6. Generate Summary Report");
+
+            System.out.println("1. View Students");
+            System.out.println("2. View Companies");
+            System.out.println("3. View Drives");
+            System.out.println("4. View Applications");
+            System.out.println("5. View Student Profile");
+            System.out.println("6. Generate Report");
             System.out.println("7. Logout");
-            System.out.println("---------------------------------");
-            System.out.print("Enter your choice: ");
+            System.out.print("Enter choice: ");
 
             try {
-
-                choice = Integer.parseInt(scanner.nextLine().trim());
-
+                choice = Integer.parseInt(scanner.nextLine());
             } catch (Exception e) {
-                System.out.println("Invalid input. Enter number only.");
+                System.out.println("Invalid input");
                 continue;
             }
 
-            switch (choice) {
-                case 1:
-                    viewAllStudents();
-                    break;
-                case 2:
-                    viewAllCompanies();
-                    break;
-                case 3:
-                    viewAllDrives();
-                    break;
-                case 4:
-                    viewAllApplications();
-                    break;
-                case 5:
-                    viewStudentProfile();
-                    break;
-                case 6:
-                    generateReport();
-                    break;
-                case 7:
-                    System.out.println("Logging out...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Try again.");
-            }
+            if (choice == 1) viewAllStudents();
+            else if (choice == 2) viewAllCompanies();
+            else if (choice == 3) viewAllDrives();
+            else if (choice == 4) viewAllApplications();
+            else if (choice == 5) viewStudentProfile();
+            else if (choice == 6) generateReport();
+            else if (choice == 7) System.out.println("Logging out...");
+            else System.out.println("Invalid choice");
         }
     }
 
-
+    // 1. Students
     private void viewAllStudents() {
-        System.out.println("\n--- ALL REGISTERED STUDENTS ---");
 
-        ArrayList<Student> students = userService.getAllStudents();
+        System.out.println("\n--- STUDENTS ---");
 
-        if (students.size() == 0) {
-            System.out.println("No students found.");
+        ArrayList<Student> list = userService.getAllStudents();
+
+        if (list.size() == 0) {
+            System.out.println("No students found");
             return;
         }
 
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i).getDisplayInfo());
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println((i + 1) + ". " + list.get(i).getDisplayInfo());
         }
-
-        System.out.println("Total students: " + students.size());
     }
 
-
-
+    // 2. Companies
     private void viewAllCompanies() {
-        System.out.println("\n--- ALL REGISTERED COMPANIES ---");
 
-        ArrayList<Company> companies = userService.getAllCompanies();
+        System.out.println("\n--- COMPANIES ---");
 
-        if (companies.size() == 0) {
-            System.out.println("No companies found.");
+        ArrayList<Company> list = userService.getAllCompanies();
+
+        if (list.size() == 0) {
+            System.out.println("No companies found");
             return;
         }
 
-        for (int i = 0; i < companies.size(); i++) {
-            System.out.println((i + 1) + ". " + companies.get(i).getDisplayInfo());
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println((i + 1) + ". " + list.get(i).getDisplayInfo());
         }
-
-        System.out.println("Total companies: " + companies.size());
     }
 
-
+    // 3. Drives
     private void viewAllDrives() {
-        System.out.println("\n--- ALL DRIVES ---");
 
-        ArrayList<Drive> drives = driveService.getAllDrives();
+        System.out.println("\n--- DRIVES ---");
 
-        if (drives.size() == 0) {
-            System.out.println("No drives available.");
+        ArrayList<Drive> list = driveService.getAllDrives();
+
+        if (list.size() == 0) {
+            System.out.println("No drives found");
             return;
         }
 
-        for (int i = 0; i < drives.size(); i++) {
-            System.out.println("\nDrive " + (i + 1));
-            drives.get(i).printDetails();
+        for (int i = 0; i < list.size(); i++) {
 
-            int count = applicationService.getApplicationsByDrive(
-                    drives.get(i).getDriveId()).size();
+            System.out.println("\nDrive " + (i + 1));
+            list.get(i).printDetails();
+
+            int count = applicationService
+                    .getApplicationsByDrive(list.get(i).getDriveId()).size();
 
             System.out.println("Applicants: " + count);
         }
-
-        System.out.println("Total drives: " + drives.size());
     }
 
+    // 4. Applications
+    private void viewAllApplications() {
 
+        System.out.println("\n--- APPLICATIONS ---");
 
-   private void viewAllApplications() {
-        System.out.println("\n--- ALL APPLICATIONS ---");
+        ArrayList<Application> list = applicationService.getAllApplications();
 
-        ArrayList<Application> apps = applicationService.getAllApplications();
-
-        if (apps.size() == 0) {
-            System.out.println("No applications found.");
+        if (list.size() == 0) {
+            System.out.println("No applications found");
             return;
         }
 
@@ -167,84 +142,67 @@ public class AdminMenu {
         int shortlisted = 0;
         int rejected = 0;
 
-        for (int i = 0; i < apps.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
+
             System.out.println((i + 1) + ". "
-                    + apps.get(i).getStudentName()
-                    + " | " + apps.get(i).getCompanyName()
-                    + " | " + apps.get(i).getJobRole()
-                    + " | " + apps.get(i).getStatus());
+                    + list.get(i).getStudentName()
+                    + " | " + list.get(i).getCompanyName()
+                    + " | " + list.get(i).getJobRole()
+                    + " | " + list.get(i).getStatus());
 
-            String status = apps.get(i).getStatus();
+            String status = list.get(i).getStatus();
 
-            if (status.equals("APPLIED")) {
-                applied++;
-            } else if (status.equals("SHORTLISTED")) {
-                shortlisted++;
-            } else if (status.equals("REJECTED")) {
-                rejected++;
-            }
+            if (status.equals("APPLIED")) applied++;
+            else if (status.equals("SHORTLISTED")) shortlisted++;
+            else if (status.equals("REJECTED")) rejected++;
         }
 
-        System.out.println("Total: " + apps.size());
+        System.out.println("Total: " + list.size());
         System.out.println("Applied: " + applied);
         System.out.println("Shortlisted: " + shortlisted);
         System.out.println("Rejected: " + rejected);
     }
 
-
+    // 5. Student profile
     private void viewStudentProfile() {
 
-        System.out.println("\n--- VIEW STUDENT PROFILE ---");
+        System.out.println("\n--- STUDENT PROFILE ---");
 
         System.out.print("Enter Student ID: ");
-        String studentId = scanner.nextLine().trim();
+        String id = scanner.nextLine();
 
-        Student student = userService.getStudentById(studentId);
+        Student s = userService.getStudentById(id);
 
-        if (student == null) {
-            System.out.println("Student not found with ID: " + studentId);
+        if (s == null) {
+            System.out.println("Student not found");
             return;
         }
 
-        System.out.println("--------------------------------");
-        System.out.println("STUDENT PROFILE");
-        System.out.println("--------------------------------");
+        System.out.println("Name: " + s.getName());
+        System.out.println("Email: " + s.getEmail());
+        System.out.println("Branch: " + s.getBranch());
+        System.out.println("CGPA: " + s.getCgpa());
+        System.out.println("Backlogs: " + s.getBacklogs());
+        System.out.println("Skills: " + s.getSkills());
+        System.out.println("Resume Score: " + s.getResumeScore());
 
-        System.out.println("Student ID  : " + student.getUserId());
-        System.out.println("Name        : " + student.getName());
-        System.out.println("Email       : " + student.getEmail());
-        System.out.println("Branch      : " + student.getBranch());
-        System.out.println("CGPA        : " + student.getCgpa());
-        System.out.println("Backlogs    : " + student.getBacklogs());
-        System.out.println("Skills      : " + student.getSkills());
-        System.out.println("Resume Score: " + student.getResumeScore() + " / 100");
+        ArrayList<Application> apps =
+                applicationService.getApplicationsByStudent(id);
 
-        System.out.println("--------------------------------");
+        System.out.println("Applications: " + apps.size());
 
-
-        ArrayList<Application> apps = applicationService.getApplicationsByStudent(studentId);
-
-        System.out.println("APPLICATIONS (" + apps.size() + "):");
-
-        if (apps.size() == 0) {
-            System.out.println("No applications found.");
-        } else {
-            for (int i = 0; i < apps.size(); i++) {
-                System.out.println("- " 
-                        + apps.get(i).getCompanyName()
-                        + " | " + apps.get(i).getJobRole()
-                        + " | Status: " + apps.get(i).getStatus());
-            }
+        for (int i = 0; i < apps.size(); i++) {
+            System.out.println("- "
+                    + apps.get(i).getCompanyName()
+                    + " | " + apps.get(i).getJobRole()
+                    + " | " + apps.get(i).getStatus());
         }
-
-        System.out.println("--------------------------------");
     }
 
-
-
+    // 6. Report
     private void generateReport() {
 
-        System.out.println("\n--- GENERATING SUMMARY REPORT ---");
+        System.out.println("\n--- REPORT ---");
 
         reportService.generateSummaryReport();
     }

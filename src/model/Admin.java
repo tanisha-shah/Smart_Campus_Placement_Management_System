@@ -1,6 +1,5 @@
 package model;
 
-// Admin class extends User - Inheritance
 public class Admin extends User {
 
     private String adminCode; 

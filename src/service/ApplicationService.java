@@ -3,18 +3,18 @@ package service;
 import model.Application;
 import model.Drive;
 import model.Student;
-import utils.FileHelper;
-import exceptions.AlreadyAppliedException;
 
 import java.util.ArrayList;
+import java.io.*;
+import java.util.Scanner;
 
 public class ApplicationService {
 
-    // Apply for a drive
-    public void applyForDrive(Student student, Drive drive) throws AlreadyAppliedException {
+    public void applyForDrive(Student student, Drive drive) {
 
         if (hasAlreadyApplied(student.getUserId(), drive.getDriveId())) {
-            throw new AlreadyAppliedException("Already applied");
+            System.out.println("Already applied");
+            return;
         }
 
         String appId = "APP" + System.currentTimeMillis();
@@ -30,12 +30,18 @@ public class ApplicationService {
                 today
         );
 
-        FileHelper.writeLineToFile(FileHelper.APPLICATIONS_FILE, app.toFileString());
+        try {
+            FileWriter fw = new FileWriter("data/applications.txt", true);
+            fw.write(app.toFileString() + "\n");
+            fw.close();
 
-        System.out.println("Applied successfully");
+            System.out.println("Applied successfully");
+
+        } catch (Exception e) {
+            System.out.println("Error writing file");
+        }
     }
 
-    // check already applied
     public boolean hasAlreadyApplied(String studentId, String driveId) {
 
         ArrayList<Application> list = getApplicationsByStudent(studentId);
@@ -49,7 +55,6 @@ public class ApplicationService {
         return false;
     }
 
-    // by student
     public ArrayList<Application> getApplicationsByStudent(String studentId) {
 
         ArrayList<Application> result = new ArrayList<Application>();
@@ -64,7 +69,6 @@ public class ApplicationService {
         return result;
     }
 
-    // by drive
     public ArrayList<Application> getApplicationsByDrive(String driveId) {
 
         ArrayList<Application> result = new ArrayList<Application>();
@@ -79,68 +83,87 @@ public class ApplicationService {
         return result;
     }
 
-    // all applications
     public ArrayList<Application> getAllApplications() {
 
         ArrayList<Application> list = new ArrayList<Application>();
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.APPLICATIONS_FILE);
 
-        for (int i = 0; i < lines.size(); i++) {
-            Application app = parseApplicationFromLine(lines.get(i));
-            if (app != null) {
-                list.add(app);
+        try {
+            File file = new File("data/applications.txt");
+            Scanner sc = new Scanner(file);
+
+            while (sc.hasNextLine()) {
+                Application app = parseApplication(sc.nextLine());
+                if (app != null) {
+                    list.add(app);
+                }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
 
         return list;
     }
 
-    // update status
     public boolean updateApplicationStatus(String applicationId, String newStatus) {
 
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.APPLICATIONS_FILE);
         ArrayList<String> updated = new ArrayList<String>();
-
         boolean found = false;
 
-        for (int i = 0; i < lines.size(); i++) {
+        try {
+            File file = new File("data/applications.txt");
+            Scanner sc = new Scanner(file);
 
-            String[] parts = lines.get(i).split(",");
+            while (sc.hasNextLine()) {
 
-            if (parts.length >= 8 && parts[0].equals(applicationId)) {
+                String line = sc.nextLine();
+                String[] parts = line.split(",");
 
-                parts[6] = newStatus;
+                if (parts.length >= 8 && parts[0].equals(applicationId)) {
 
-                String newLine = "";
-                for (int j = 0; j < parts.length; j++) {
-                    newLine += parts[j];
-                    if (j < parts.length - 1) {
-                        newLine += ",";
+                    parts[6] = newStatus;
+
+                    String newLine = "";
+
+                    for (int i = 0; i < parts.length; i++) {
+                        newLine += parts[i];
+                        if (i != parts.length - 1) {
+                            newLine += ",";
+                        }
                     }
+
+                    updated.add(newLine);
+                    found = true;
+
+                } else {
+                    updated.add(line);
                 }
-
-                updated.add(newLine);
-                found = true;
-
-            } else {
-                updated.add(lines.get(i));
             }
-        }
 
-        if (found) {
-            FileHelper.writeAllLines(FileHelper.APPLICATIONS_FILE, updated);
+            sc.close();
+
+            if (found) {
+                FileWriter fw = new FileWriter("data/applications.txt");
+                for (int i = 0; i < updated.size(); i++) {
+                    fw.write(updated.get(i) + "\n");
+                }
+                fw.close();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error updating file");
         }
 
         return found;
     }
 
-    // count
     public int getApplicationCount() {
         return getAllApplications().size();
     }
 
-    // parse
-    private Application parseApplicationFromLine(String line) {
+    private Application parseApplication(String line) {
 
         try {
             String[] p = line.split(",");

@@ -1,31 +1,50 @@
 package service;
 
-import exceptions.DriveNotFoundException;
 import java.util.ArrayList;
+import java.io.*;
+import java.util.Scanner;
 import model.Drive;
 import model.Student;
-import utils.FileHelper;
 
 public class DriveService {
 
     // POST DRIVE
     public void postDrive(Drive drive) {
-        FileHelper.writeLineToFile(FileHelper.DRIVES_FILE, drive.toFileString());
-        System.out.println("Drive posted successfully! ID: " + drive.getDriveId());
+
+        try {
+            FileWriter fw = new FileWriter("data/drives.txt", true);
+            fw.write(drive.toFileString() + "\n");
+            fw.close();
+
+            System.out.println("Drive posted successfully! ID: " + drive.getDriveId());
+
+        } catch (Exception e) {
+            System.out.println("Error writing file");
+        }
     }
 
     // GET ALL DRIVES
     public ArrayList<Drive> getAllDrives() {
 
         ArrayList<Drive> drives = new ArrayList<>();
-        ArrayList<String> lines = FileHelper.readAllLines(FileHelper.DRIVES_FILE);
 
-        for (int i = 0; i < lines.size(); i++) {
-            Drive d = parseDrive(lines.get(i));
-            if (d != null) {
-                drives.add(d);
+        try {
+            File file = new File("data/drives.txt");
+            Scanner sc = new Scanner(file);
+
+            while (sc.hasNextLine()) {
+                Drive d = parseDrive(sc.nextLine());
+                if (d != null) {
+                    drives.add(d);
+                }
             }
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error reading file");
         }
+
         return drives;
     }
 
@@ -40,6 +59,7 @@ public class DriveService {
                 active.add(all.get(i));
             }
         }
+
         return active;
     }
 
@@ -54,6 +74,7 @@ public class DriveService {
                 list.add(all.get(i));
             }
         }
+
         return list;
     }
 
@@ -94,7 +115,7 @@ public class DriveService {
     }
 
     // GET DRIVE BY ID
-    public Drive getDriveById(String id) throws DriveNotFoundException {
+    public Drive getDriveById(String id) {
 
         ArrayList<Drive> list = getAllDrives();
 
@@ -104,10 +125,11 @@ public class DriveService {
             }
         }
 
-        throw new DriveNotFoundException("Drive not found");
+        System.out.println("Drive not found");
+        return null;
     }
 
-    // SKILL GAP
+    // SKILL GAP (simple)
     public ArrayList<String> analyzeSkillGap(Student s, Drive d) {
 
         ArrayList<String> missing = new ArrayList<>();
@@ -140,7 +162,7 @@ public class DriveService {
         return getAllDrives().size();
     }
 
-    // PARSE CSV
+    // PARSE DRIVE
     private Drive parseDrive(String line) {
 
         try {

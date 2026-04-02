@@ -31,6 +31,7 @@ public class StudentMenu {
 
     // MAIN MENU
     public void showMenu(Student stu) {
+
         loggedInStudent = stu;
         int choice = 0;
 
@@ -56,17 +57,15 @@ public class StudentMenu {
                 continue;
             }
 
-            switch (choice) {
-                case 1: viewAllDrives(); break;
-                case 2: viewEligibleDrives(); break;
-                case 3: applyForDrive(); break;
-                case 4: trackApplications(); break;
-                case 5: analyzeSkillGap(); break;
-                case 6: viewResumeScore(); break;
-                case 7: manageSkills(); break;
-                case 8: System.out.println("Logging out..."); break;
-                default: System.out.println("Invalid choice");
-            }
+            if (choice == 1) viewAllDrives();
+            else if (choice == 2) viewEligibleDrives();
+            else if (choice == 3) applyForDrive();
+            else if (choice == 4) trackApplications();
+            else if (choice == 5) analyzeSkillGap();
+            else if (choice == 6) viewResumeScore();
+            else if (choice == 7) manageSkills();
+            else if (choice == 8) System.out.println("Logging out...");
+            else System.out.println("Invalid choice");
         }
     }
 
@@ -86,11 +85,9 @@ public class StudentMenu {
             System.out.println("\nDrive " + (i + 1));
             drives.get(i).printDetails();
         }
-
-        System.out.println("Total: " + drives.size());
     }
 
-    // 2. View eligible drives
+    // 2. Eligible drives
     private void viewEligibleDrives() {
 
         System.out.println("\n--- ELIGIBLE DRIVES ---");
@@ -106,11 +103,9 @@ public class StudentMenu {
             System.out.println("\nDrive " + (i + 1));
             drives.get(i).printDetails();
         }
-
-        System.out.println("Total: " + drives.size());
     }
 
-    // 3. Apply for drive
+    // 3. Apply
     private void applyForDrive() {
 
         System.out.println("\n--- APPLY FOR DRIVE ---");
@@ -132,17 +127,14 @@ public class StudentMenu {
         System.out.print("Enter Drive ID: ");
         String id = scanner.nextLine();
 
-        try {
-            Drive d = driveService.getDriveById(id);
-            applicationService.applyForDrive(loggedInStudent, d);
-            System.out.println("Applied successfully");
+        Drive d = driveService.getDriveById(id);
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (d != null) {
+            applicationService.applyForDrive(loggedInStudent, d);
         }
     }
 
-    // 4. Track applications
+    // 4. Track
     private void trackApplications() {
 
         System.out.println("\n--- MY APPLICATIONS ---");
@@ -158,11 +150,9 @@ public class StudentMenu {
         for (int i = 0; i < apps.size(); i++) {
             apps.get(i).printDetails();
         }
-
-        System.out.println("Total: " + apps.size());
     }
 
-    // 5. Skill gap analysis
+    // 5. Skill gap
     private void analyzeSkillGap() {
 
         System.out.println("\n--- SKILL GAP ---");
@@ -178,20 +168,17 @@ public class StudentMenu {
         System.out.print("Enter Drive ID: ");
         String id = scanner.nextLine();
 
-        try {
-            Drive d = driveService.getDriveById(id);
+        Drive d = driveService.getDriveById(id);
 
+        if (d != null) {
             ArrayList<String> missing =
                     driveService.analyzeSkillGap(loggedInStudent, d);
 
             System.out.println("Missing skills: " + missing);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 
-    // 6. Resume score
+    // 6. Resume
     private void viewResumeScore() {
 
         Student fresh = userService.getStudentById(loggedInStudent.getUserId());
@@ -203,7 +190,7 @@ public class StudentMenu {
         reportService.generateResumeReport(loggedInStudent);
     }
 
-    // 7. Manage skills
+    // 7. Skills
     private void manageSkills() {
 
         int choice = 0;
@@ -229,7 +216,7 @@ public class StudentMenu {
                 System.out.print("Enter skill: ");
                 String s = scanner.nextLine();
 
-                if (!s.isEmpty()) {
+                if (!s.equals("")) {
                     loggedInStudent.addSkill(s);
                     userService.updateStudent(loggedInStudent);
                     System.out.println("Skill added");

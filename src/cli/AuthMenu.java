@@ -1,7 +1,5 @@
 package cli;
 
-import exceptions.InvalidLoginException;
-import exceptions.UserAlreadyExistsException;
 import java.util.Scanner;
 import model.Admin;
 import model.Company;
@@ -18,7 +16,6 @@ public class AuthMenu {
         userService = us;
     }
 
-    // -------- STUDENT REGISTER --------
     public Student registerStudent() {
 
         System.out.println("\n--- STUDENT REGISTER ---");
@@ -52,13 +49,11 @@ public class AuthMenu {
             if (!input.equals("")) {
                 String[] arr = input.split(",");
                 for (int i = 0; i < arr.length; i++) {
-                    s.addSkill(arr[i].trim());   // trimmed (small improvement)
+                    s.addSkill(arr[i].trim());
                 }
             }
 
             userService.registerStudent(s);
-            System.out.println("Student registered");
-
             return s;
 
         } catch (Exception e) {
@@ -67,7 +62,6 @@ public class AuthMenu {
         }
     }
 
-    // -------- STUDENT LOGIN --------
     public Student loginStudent() {
 
         System.out.println("\n--- STUDENT LOGIN ---");
@@ -78,17 +72,15 @@ public class AuthMenu {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        try {
-            Student s = userService.loginStudent(email, password);
+        Student s = userService.loginStudent(email, password);
+
+        if (s != null) {
             System.out.println("Login success");
-            return s;
-        } catch (InvalidLoginException e) {
-            System.out.println("Invalid login");
-            return null;
         }
+
+        return s;
     }
 
-    // -------- COMPANY REGISTER --------
     public Company registerCompany() {
 
         System.out.println("\n--- COMPANY REGISTER ---");
@@ -117,20 +109,14 @@ public class AuthMenu {
             Company c = new Company(id, name, email, password, cname, industry, contact);
 
             userService.registerCompany(c);
-            System.out.println("Company registered");
-
             return c;
 
-        } catch (UserAlreadyExistsException e) {
-            System.out.println("Company already exists");
-            return null;
         } catch (Exception e) {
             System.out.println("Error in registration");
             return null;
         }
     }
 
-    // -------- COMPANY LOGIN --------
     public Company loginCompany() {
 
         System.out.println("\n--- COMPANY LOGIN ---");
@@ -141,17 +127,15 @@ public class AuthMenu {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        try {
-            Company c = userService.loginCompany(email, password);
+        Company c = userService.loginCompany(email, password);
+
+        if (c != null) {
             System.out.println("Login success");
-            return c;
-        } catch (InvalidLoginException e) {
-            System.out.println("Invalid login");
-            return null;
         }
+
+        return c;
     }
 
-    // -------- ADMIN LOGIN --------
     public Admin loginAdmin() {
 
         System.out.println("\n--- ADMIN LOGIN ---");
@@ -162,13 +146,12 @@ public class AuthMenu {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        try {
-            Admin a = userService.loginAdmin(email, password);
+        Admin a = userService.loginAdmin(email, password);
+
+        if (a != null) {
             System.out.println("Admin login success");
-            return a;
-        } catch (InvalidLoginException e) {
-            System.out.println("Invalid login");
-            return null;
         }
+
+        return a;
     }
 }

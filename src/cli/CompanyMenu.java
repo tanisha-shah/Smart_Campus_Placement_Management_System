@@ -27,7 +27,6 @@ public class CompanyMenu {
         userService = us;
     }
 
-
     public void showMenu(Company company) {
 
         loggedInCompany = company;
@@ -52,18 +51,16 @@ public class CompanyMenu {
                 continue;
             }
 
-            switch (choice) {
-                case 1: postNewDrive(); break;
-                case 2: viewMyDrives(); break;
-                case 3: viewApplicants(); break;
-                case 4: shortlistOrReject(); break;
-                case 5: System.out.println("Logging out..."); break;
-                default: System.out.println("Invalid choice");
-            }
+            if (choice == 1) postNewDrive();
+            else if (choice == 2) viewMyDrives();
+            else if (choice == 3) viewApplicants();
+            else if (choice == 4) shortlistOrReject();
+            else if (choice == 5) System.out.println("Logging out...");
+            else System.out.println("Invalid choice");
         }
     }
 
-
+    // 1. POST DRIVE
     private void postNewDrive() {
 
         System.out.println("\n--- POST DRIVE ---");
@@ -111,14 +108,16 @@ public class CompanyMenu {
                     jobType
             );
 
-            if (!branchInput.equalsIgnoreCase("ALL") && !branchInput.isEmpty()) {
+            // branches
+            if (!branchInput.equalsIgnoreCase("ALL") && !branchInput.equals("")) {
                 String[] arr = branchInput.split(",");
                 for (int i = 0; i < arr.length; i++) {
                     d.addEligibleBranch(arr[i]);
                 }
             }
 
-            if (!skillInput.equalsIgnoreCase("NONE") && !skillInput.isEmpty()) {
+            // skills
+            if (!skillInput.equalsIgnoreCase("NONE") && !skillInput.equals("")) {
                 String[] arr = skillInput.split(",");
                 for (int i = 0; i < arr.length; i++) {
                     d.addRequiredSkill(arr[i]);
@@ -126,7 +125,6 @@ public class CompanyMenu {
             }
 
             driveService.postDrive(d);
-            System.out.println("Drive posted successfully");
 
         } catch (Exception e) {
             System.out.println("Error posting drive");
@@ -147,6 +145,7 @@ public class CompanyMenu {
         }
 
         for (int i = 0; i < list.size(); i++) {
+
             System.out.println("\nDrive " + (i + 1));
             list.get(i).printDetails();
 
@@ -155,8 +154,6 @@ public class CompanyMenu {
 
             System.out.println("Applicants: " + count);
         }
-
-        System.out.println("Total: " + list.size());
     }
 
     // 3. VIEW APPLICANTS
@@ -189,11 +186,9 @@ public class CompanyMenu {
                 System.out.println("Backlogs: " + s.getBacklogs());
             }
         }
-
-        System.out.println("Total: " + apps.size());
     }
 
-    // 4. SHORTLIST / REJECT
+    // 4. UPDATE STATUS
     private void shortlistOrReject() {
 
         System.out.println("\n--- UPDATE APPLICATION ---");

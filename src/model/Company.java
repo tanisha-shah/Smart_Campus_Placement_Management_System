@@ -1,14 +1,14 @@
 package model;
 
-
 public class Company extends User {
 
     private String companyName;
     private String industry;
     private String contactPerson;
 
-   public Company(String uId, String nm, String em, String pass,
-               String compName, String ind, String contact) {
+    // constructor
+    public Company(String uId, String nm, String em, String pass,
+                   String compName, String ind, String contact) {
 
         super(uId, nm, em, pass, "COMPANY");
 
@@ -41,16 +41,19 @@ public class Company extends User {
         contactPerson = contact;
     }
 
-    //Dynamic Method Dispatch
+    // display company info
     public String getDisplayInfo() {
-        return "Company ID: " + getUserId() + " | Company: " + companyName
-                + " | Industry: " + industry + " | Contact: " + contactPerson
-                + " | Email: " + getEmail();
+        return "Company ID: " + getUserId() +
+                " | Company: " + companyName +
+                " | Industry: " + industry +
+                " | Contact: " + contactPerson +
+                " | Email: " + getEmail();
     }
 
-    // Convert to file-safe string
+    // convert to file string
     public String toFileString() {
         return getUserId() + "," + getName() + "," + getEmail() + ","
-                + getPassword() + ",COMPANY," + companyName + "," + industry + "," + contactPerson;
+                + getPassword() + ",COMPANY," + companyName + ","
+                + industry + "," + contactPerson;
     }
 }
